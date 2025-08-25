@@ -70,11 +70,11 @@ const HeroSection = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/70 to-transparent" />
             <div className="relative z-10 flex h-full flex-col items-center justify-center text-center text-white p-4">
-                <div className="bg-black/30 backdrop-blur-sm p-6 md:p-8 rounded-lg animate-fade-in opacity-0">
-                    <h1 className="font-headline text-4xl md:text-6xl font-bold tracking-tight text-white">
+                <div className="p-6 md:p-8 rounded-lg animate-fade-in opacity-0">
+                    <h1 className="font-headline text-4xl md:text-6xl font-bold tracking-tight text-white drop-shadow-lg">
                         Experience True Elegance
                     </h1>
-                    <p className="mt-4 max-w-2xl text-base md:text-xl text-primary-foreground/90">
+                    <p className="mt-4 max-w-2xl text-base md:text-xl text-primary-foreground/90 drop-shadow-md">
                         Indulge in a world of beauty and relaxation. Your journey to radiance begins here.
                     </p>
                     <Button size="lg" className="mt-8">
