@@ -2,6 +2,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from 'next/link';
 import { Header } from "@/components/glamora/header";
 import { Footer } from "@/components/glamora/footer";
 import { Button } from "@/components/ui/button";
@@ -15,83 +16,17 @@ import {
 } from "@/components/ui/carousel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Scissors,
-  Droplets,
-  Sparkles,
-  Paintbrush,
   Quote,
   MapPin,
   Phone,
   Mail,
   PlusCircle,
-  Palette,
-  Gem,
-  HeartHandshake,
-  PenTool,
 } from "lucide-react";
 import { StyleRecommender } from "@/components/glamora/style-recommender";
 import { useCart, CartItem } from "@/context/cart-context";
 import { useToast } from "@/hooks/use-toast";
+import { services } from "@/lib/services";
 
-
-const services = [
-  {
-    id: "1",
-    icon: <Scissors className="w-10 h-10 text-primary" />,
-    name: "Precision Haircut & Style",
-    description: "A tailored cut and style to perfectly frame your face and match your lifestyle.",
-    price: 6500,
-  },
-  {
-    id: "2",
-    icon: <Paintbrush className="w-10 h-10 text-primary" />,
-    name: "Luxury Manicure & Pedicure",
-    description: "Indulge in a relaxing treatment that leaves your nails flawlessly polished.",
-    price: 5000,
-  },
-  {
-    id: "3",
-    icon: <Droplets className="w-10 h-10 text-primary" />,
-    name: "Revitalizing Facial",
-    description: "A custom facial using premium products to rejuvenate and nourish your skin.",
-    price: 10000,
-  },
-  {
-    id: "4",
-    icon: <Sparkles className="w-10 h-10 text-primary" />,
-    name: "Professional Makeup",
-    description: "Get a stunning look for any special occasion, applied by our expert makeup artists.",
-    price: 7500,
-  },
-  {
-    id: "5",
-    icon: <Palette className="w-10 h-10 text-primary" />,
-    name: "Radiant Hair Coloring",
-    description: "From subtle highlights to bold new colors, our experts will find the perfect shade for you.",
-    price: 8500,
-  },
-  {
-    id: "6",
-    icon: <Gem className="w-10 h-10 text-primary" />,
-    name: "Bridal Glow Package",
-    description: "A complete package including makeup, hair, and a pre-wedding facial for your special day.",
-    price: 25000,
-  },
-  {
-    id: "7",
-    icon: <HeartHandshake className="w-10 h-10 text-primary" />,
-    name: "Deep Tissue Massage",
-    description: "Release tension and soothe sore muscles with our therapeutic deep tissue massage.",
-    price: 6000,
-  },
-  {
-    id: "8",
-    icon: <PenTool className="w-10 h-10 text-primary" />,
-    name: "Expert Brow Shaping",
-    description: "Perfectly sculpted eyebrows to define your features, using threading or waxing.",
-    price: 1500,
-  },
-];
 
 const testimonials = [
   {
@@ -143,7 +78,9 @@ const ServicesSection = () => {
     const { addItem } = useCart();
     const { toast } = useToast();
 
-    const handleAddToBooking = (service: Omit<CartItem, 'quantity'>) => {
+    const handleAddToBooking = (e: React.MouseEvent, service: Omit<CartItem, 'quantity'>) => {
+        e.preventDefault();
+        e.stopPropagation();
         addItem({ ...service, quantity: 1 });
         toast({
             title: "Added to Booking",
@@ -165,22 +102,24 @@ const ServicesSection = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {services.map((service) => (
-              <Card key={service.id} className="group flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2">
-                <CardContent className="p-6 text-center flex flex-col flex-grow">
-                  <div className="flex justify-center mb-4">{service.icon}</div>
-                  <h3 className="font-headline text-xl font-semibold mb-2">{service.name}</h3>
-                  <p className="text-muted-foreground text-sm mb-4 flex-grow">
-                    {service.description}
-                  </p>
-                  <p className="font-semibold text-primary">৳{service.price.toFixed(2)}</p>
-                </CardContent>
-                <CardFooter className="p-4 bg-card/50">
-                    <Button className="w-full" onClick={() => handleAddToBooking(service)}>
-                        <PlusCircle className="mr-2 h-4 w-4"/>
-                        Add to Booking
-                    </Button>
-                </CardFooter>
-              </Card>
+              <Link href={`/service/${service.id}`} key={service.id} className="group flex flex-col no-underline">
+                <Card className="flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2 h-full">
+                  <CardContent className="p-6 text-center flex flex-col flex-grow">
+                    <div className="flex justify-center mb-4">{service.icon}</div>
+                    <h3 className="font-headline text-xl font-semibold mb-2">{service.name}</h3>
+                    <p className="text-muted-foreground text-sm mb-4 flex-grow">
+                      {service.shortDescription}
+                    </p>
+                    <p className="font-semibold text-primary">৳{service.price.toFixed(2)}</p>
+                  </CardContent>
+                  <CardFooter className="p-4 bg-card/50 mt-auto">
+                      <Button className="w-full" onClick={(e) => handleAddToBooking(e, service)}>
+                          <PlusCircle className="mr-2 h-4 w-4"/>
+                          Add to Booking
+                      </Button>
+                  </CardFooter>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
