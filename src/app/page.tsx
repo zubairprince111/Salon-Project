@@ -1,5 +1,6 @@
 
 "use client";
+import React from "react";
 
 import Image from "next/image";
 import Link from 'next/link';
@@ -21,11 +22,13 @@ import {
   Phone,
   Mail,
   PlusCircle,
+  HeartHandshake,
 } from "lucide-react";
 import { StyleRecommender } from "@/components/glamora/style-recommender";
 import { useCart, CartItem } from "@/context/cart-context";
 import { useToast } from "@/hooks/use-toast";
-import { services } from "@/lib/services";
+import { services } from "@/lib/services.tsx";
+import Autoplay from "embla-carousel-autoplay"
 
 
 const testimonials = [
@@ -46,33 +49,87 @@ const testimonials = [
   },
 ];
 
-const HeroSection = () => (
-  <section className="relative h-[70vh] min-h-[450px] w-full">
-    <Image
-      src="https://placehold.co/1600x900.png"
-      alt="Interior of a luxury beauty salon"
-      data-ai-hint="salon interior"
-      fill
-      className="object-cover object-center"
-      priority
-    />
-    <div className="absolute inset-0 bg-gradient-to-t from-background/70 to-transparent" />
-    <div className="relative z-10 flex h-full flex-col items-center justify-center text-center text-white p-4">
-      <div className="bg-black/30 backdrop-blur-sm p-6 md:p-8 rounded-lg">
-        <h1 className="font-headline text-4xl md:text-6xl font-bold tracking-tight text-white">
-          Experience True Elegance
-        </h1>
-        <p className="mt-4 max-w-2xl text-base md:text-xl text-primary-foreground/90">
-          Indulge in a world of beauty and relaxation. Your journey to radiance
-          begins here.
-        </p>
-        <Button size="lg" className="mt-8">
-          Book Your Appointment
-        </Button>
-      </div>
-    </div>
-  </section>
-);
+
+const heroSlides = [
+    {
+        image: {
+            src: "https://placehold.co/1600x900.png",
+            alt: "Interior of a luxury beauty salon",
+            aiHint: "salon interior"
+        },
+        title: "Experience True Elegance",
+        description: "Indulge in a world of beauty and relaxation. Your journey to radiance begins here.",
+        buttonText: "Book Your Appointment"
+    },
+    {
+        image: {
+            src: "https://placehold.co/1600x900.png",
+            alt: "Woman receiving a relaxing facial",
+            aiHint: "woman facial"
+        },
+        title: "20% Off Revitalizing Facials",
+        description: "This month only, treat your skin to our signature facial and get a 20% discount.",
+        buttonText: "Claim Offer"
+    },
+    {
+        image: {
+            src: "https://placehold.co/1600x900.png",
+            alt: "Stylish haircut and coloring",
+            aiHint: "haircut color"
+        },
+        title: "Discover Your Perfect Color",
+        description: "Our expert colorists are here to help you find the shade that makes you shine.",
+        buttonText: "Explore Coloring Services"
+    }
+]
+
+
+const HeroSection = () => {
+    const plugin = React.useRef(
+        Autoplay({ delay: 20000, stopOnInteraction: true })
+    )
+
+    return (
+        <section className="relative h-[70vh] min-h-[450px] w-full">
+             <Carousel
+                plugins={[plugin.current]}
+                className="w-full h-full"
+                onMouseEnter={plugin.current.stop}
+                onMouseLeave={plugin.current.reset}
+                opts={{ loop: true }}
+            >
+                <CarouselContent className="h-full">
+                    {heroSlides.map((slide, index) => (
+                        <CarouselItem key={index} className="h-full">
+                             <Image
+                                src={slide.image.src}
+                                alt={slide.image.alt}
+                                data-ai-hint={slide.image.aiHint}
+                                fill
+                                className="object-cover object-center"
+                                priority={index === 0}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-background/70 to-transparent" />
+                            <div className="relative z-10 flex h-full flex-col items-center justify-center text-center text-white p-4">
+                                <div className="bg-black/30 backdrop-blur-sm p-6 md:p-8 rounded-lg animate-fade-in opacity-0">
+                                    <h1 className="font-headline text-4xl md:text-6xl font-bold tracking-tight text-white">
+                                       {slide.title}
+                                    </h1>
+                                    <p className="mt-4 max-w-2xl text-base md:text-xl text-primary-foreground/90">
+                                        {slide.description}
+                                    </p>
+                                    <Button size="lg" className="mt-8">
+                                        {slide.buttonText}
+                                    </Button>
+                                </div>
+                            </div>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+            </Carousel>
+        </section>
+    )
+};
 
 const ServicesSection = () => {
     const { addItem } = useCart();
