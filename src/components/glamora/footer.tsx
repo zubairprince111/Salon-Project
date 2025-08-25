@@ -20,7 +20,8 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link href="#services" className="hover:text-primary transition-colors">Services</Link></li>
               <li><Link href="#about" className="hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link href="#testimonials" className="hover:text-primary transition-colors">Testimonials</Link></li>
+              <li><Link href="#style-recommender" className="hover:text-primary transition-colors">AI Stylist</Link></li>
+              <li><Link href="#testimonials" className="hover:text-primary transition--colors">Testimonials</Link></li>
               <li><Link href="#contact" className="hover:text-primary transition-colors">Contact</Link></li>
             </ul>
           </div>

@@ -22,6 +22,7 @@ export function Header() {
   const navLinks = [
     { href: '#services', label: 'Services' },
     { href: '#about', label: 'About Us' },
+    { href: '#style-recommender', label: 'AI Stylist' },
     { href: '#testimonials', label: 'Testimonials' },
     { href: '#contact', label: 'Contact' },
   ];
@@ -33,9 +34,9 @@ export function Header() {
   const NavItems = () => (
     <>
       {navLinks.map((link) => (
-        <Link 
-          key={link.href} 
-          href={link.href} 
+        <Link
+          key={link.href}
+          href={link.href}
           className="text-sm font-medium transition-colors hover:text-primary"
           onClick={handleLinkClick}
         >

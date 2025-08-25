@@ -21,6 +21,7 @@ import {
   Phone,
   Mail,
 } from "lucide-react";
+import { StyleRecommender } from "@/components/glamora/style-recommender";
 
 const services = [
   {
@@ -282,6 +283,7 @@ export default function Home() {
         <HeroSection />
         <ServicesSection />
         <AboutSection />
+        <StyleRecommender />
         <TestimonialsSection />
         <ContactSection />
       </main>
