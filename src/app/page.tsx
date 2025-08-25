@@ -112,7 +112,7 @@ const testimonials = [
 ];
 
 const HeroSection = () => (
-  <section className="relative h-[80vh] min-h-[500px] w-full">
+  <section className="relative h-[70vh] min-h-[450px] w-full">
     <Image
       src="https://placehold.co/1600x900.png"
       alt="Interior of a luxury beauty salon"
@@ -123,11 +123,11 @@ const HeroSection = () => (
     />
     <div className="absolute inset-0 bg-gradient-to-t from-background/70 to-transparent" />
     <div className="relative z-10 flex h-full flex-col items-center justify-center text-center text-white p-4">
-      <div className="bg-black/30 backdrop-blur-sm p-8 rounded-lg">
-        <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white">
+      <div className="bg-black/30 backdrop-blur-sm p-6 md:p-8 rounded-lg">
+        <h1 className="font-headline text-4xl md:text-6xl font-bold tracking-tight text-white">
           Experience True Elegance
         </h1>
-        <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/90">
+        <p className="mt-4 max-w-2xl text-base md:text-xl text-primary-foreground/90">
           Indulge in a world of beauty and relaxation. Your journey to radiance
           begins here.
         </p>
@@ -152,7 +152,7 @@ const ServicesSection = () => {
     };
 
     return (
-      <section id="services" className="py-20 md:py-32">
+      <section id="services" className="py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-12">
             <h2 className="font-headline text-3xl md:text-4xl font-bold">
@@ -163,7 +163,7 @@ const ServicesSection = () => {
               feel your best.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {services.map((service) => (
               <Card key={service.id} className="group flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2">
                 <CardContent className="p-6 text-center flex flex-col flex-grow">
@@ -189,7 +189,7 @@ const ServicesSection = () => {
 };
 
 const AboutSection = () => (
-  <section id="about" className="bg-card/50 py-20 md:py-32">
+  <section id="about" className="bg-card/50 py-16 md:py-24">
     <div className="container mx-auto px-4 md:px-6">
       <div className="grid md:grid-cols-2 gap-12 items-center">
         <div className="order-2 md:order-1">
@@ -230,7 +230,7 @@ const AboutSection = () => (
 );
 
 const TestimonialsSection = () => (
-  <section id="testimonials" className="py-20 md:py-32">
+  <section id="testimonials" className="py-16 md:py-24">
     <div className="container mx-auto px-4 md:px-6">
       <div className="text-center mb-12">
         <h2 className="font-headline text-3xl md:text-4xl font-bold">
@@ -246,11 +246,11 @@ const TestimonialsSection = () => (
           align: "start",
           loop: true,
         }}
-        className="w-full max-w-4xl mx-auto"
+        className="w-full max-w-xs sm:max-w-xl md:max-w-2xl lg:max-w-4xl mx-auto"
       >
         <CarouselContent>
           {testimonials.map((testimonial, index) => (
-            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+            <CarouselItem key={index} className="sm:basis-1/2 lg:basis-1/3">
               <div className="p-1 h-full">
                 <Card className="flex flex-col justify-between h-full shadow-lg">
                   <CardContent className="p-6 text-center flex flex-col items-center">
@@ -274,15 +274,15 @@ const TestimonialsSection = () => (
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <CarouselPrevious className="hidden sm:flex" />
+        <CarouselNext className="hidden sm:flex" />
       </Carousel>
     </div>
   </section>
 );
 
 const ContactSection = () => (
-  <section id="contact" className="bg-card/50 py-20 md:py-32">
+  <section id="contact" className="bg-card/50 py-16 md:py-24">
     <div className="container mx-auto px-4 md:px-6">
       <div className="text-center mb-12">
         <h2 className="font-headline text-3xl md:text-4xl font-bold">
@@ -294,7 +294,7 @@ const ContactSection = () => (
         </p>
       </div>
       <div className="grid md:grid-cols-2 gap-12 items-center">
-        <div>
+        <div className="w-full">
           <Image
             src="https://placehold.co/600x450.png"
             alt="Map showing salon location"
@@ -306,7 +306,7 @@ const ContactSection = () => (
         </div>
         <div className="space-y-6">
           <div className="flex items-start gap-4">
-            <MapPin className="w-6 h-6 text-primary mt-1" />
+            <MapPin className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
             <div>
               <h3 className="font-headline font-semibold">Our Address</h3>
               <p className="text-muted-foreground">
@@ -315,14 +315,14 @@ const ContactSection = () => (
             </div>
           </div>
           <div className="flex items-start gap-4">
-            <Phone className="w-6 h-6 text-primary mt-1" />
+            <Phone className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
             <div>
               <h3 className="font-headline font-semibold">Phone</h3>
               <p className="text-muted-foreground">(123) 456-7890</p>
             </div>
           </div>
           <div className="flex items-start gap-4">
-            <Mail className="w-6 h-6 text-primary mt-1" />
+            <Mail className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
             <div>
               <h3 className="font-headline font-semibold">Email</h3>
               <p className="text-muted-foreground">hello@glamora.com</p>

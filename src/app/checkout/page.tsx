@@ -60,39 +60,8 @@ export default function CheckoutPage() {
           </p>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-12">
-            <div>
-                <Card className="shadow-lg">
-                    <CardHeader>
-                        <CardTitle>Your Booking</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {items.length === 0 ? (
-                            <p className="text-muted-foreground">Your booking cart is empty.</p>
-                        ) : (
-                            <div className="space-y-4">
-                                {items.map(item => (
-                                    <div key={item.id} className="flex justify-between items-center">
-                                        <div>
-                                            <p className="font-semibold">{item.name}</p>
-                                            <p className="text-sm text-muted-foreground">৳{item.price.toFixed(2)}</p>
-                                        </div>
-                                        <Button variant="ghost" size="icon" onClick={() => removeItem(item.id)}>
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                ))}
-                                <Separator />
-                                <div className="flex justify-between font-bold text-lg">
-                                    <p>Total</p>
-                                    <p>৳{total.toFixed(2)}</p>
-                                </div>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
-            <div>
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+            <div className="order-2 md:order-1">
                 <Card className="shadow-lg">
                     <CardHeader>
                         <CardTitle>Your Information</CardTitle>
@@ -150,6 +119,37 @@ export default function CheckoutPage() {
                             Payment will be processed at the salon.
                         </p>
                     </CardFooter>
+                </Card>
+            </div>
+            <div className="order-1 md:order-2">
+                <Card className="shadow-lg">
+                    <CardHeader>
+                        <CardTitle>Your Booking</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {items.length === 0 ? (
+                            <p className="text-muted-foreground">Your booking cart is empty.</p>
+                        ) : (
+                            <div className="space-y-4">
+                                {items.map(item => (
+                                    <div key={item.id} className="flex justify-between items-center">
+                                        <div>
+                                            <p className="font-semibold">{item.name}</p>
+                                            <p className="text-sm text-muted-foreground">৳{item.price.toFixed(2)}</p>
+                                        </div>
+                                        <Button variant="ghost" size="icon" onClick={() => removeItem(item.id)}>
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                ))}
+                                <Separator />
+                                <div className="flex justify-between font-bold text-lg">
+                                    <p>Total</p>
+                                    <p>৳{total.toFixed(2)}</p>
+                                </div>
+                            </div>
+                        )}
+                    </CardContent>
                 </Card>
             </div>
         </div>
