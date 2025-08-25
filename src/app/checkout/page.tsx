@@ -20,13 +20,13 @@ const initialCartItems = [
     {
         id: "1",
         name: "Precision Haircut & Style",
-        price: 75,
+        price: 6500,
         quantity: 1,
     },
     {
         id: "2",
         name: "Luxury Manicure & Pedicure",
-        price: 60,
+        price: 5000,
         quantity: 1,
     }
 ];
@@ -93,7 +93,7 @@ export default function CheckoutPage() {
                                     <div key={item.id} className="flex justify-between items-center">
                                         <div>
                                             <p className="font-semibold">{item.name}</p>
-                                            <p className="text-sm text-muted-foreground">${item.price.toFixed(2)}</p>
+                                            <p className="text-sm text-muted-foreground">৳{item.price.toFixed(2)}</p>
                                         </div>
                                         <Button variant="ghost" size="icon" onClick={() => removeItem(item.id)}>
                                             <Trash2 className="h-4 w-4" />
@@ -103,7 +103,7 @@ export default function CheckoutPage() {
                                 <Separator />
                                 <div className="flex justify-between font-bold text-lg">
                                     <p>Total</p>
-                                    <p>${total.toFixed(2)}</p>
+                                    <p>৳{total.toFixed(2)}</p>
                                 </div>
                             </div>
                         )}

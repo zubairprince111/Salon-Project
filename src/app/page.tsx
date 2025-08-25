@@ -29,25 +29,25 @@ const services = [
     icon: <Scissors className="w-10 h-10 text-primary" />,
     name: "Precision Haircut & Style",
     description: "A tailored cut and style to perfectly frame your face and match your lifestyle.",
-    price: "$75+",
+    price: "৳6500+",
   },
   {
     icon: <Paintbrush className="w-10 h-10 text-primary" />,
     name: "Luxury Manicure & Pedicure",
     description: "Indulge in a relaxing treatment that leaves your nails flawlessly polished.",
-    price: "$60+",
+    price: "৳5000+",
   },
   {
     icon: <Droplets className="w-10 h-10 text-primary" />,
     name: "Revitalizing Facial",
     description: "A custom facial using premium products to rejuvenate and nourish your skin.",
-    price: "$120+",
+    price: "৳10000+",
   },
   {
     icon: <Sparkles className="w-10 h-10 text-primary" />,
     name: "Professional Makeup",
     description: "Get a stunning look for any special occasion, applied by our expert makeup artists.",
-    price: "$90+",
+    price: "৳7500+",
   },
 ];
 
