@@ -58,7 +58,7 @@ const testimonials = [
 ];
 
 
-const heroSlides = [
+const initialHeroSlides = [
     {
         image: {
             src: "https://drive.google.com/uc?export=view&id=1dOWY5mm6lhHD6Bky5Y_ztPc7fXjAv3uV",
@@ -89,13 +89,23 @@ const heroSlides = [
         description: "Our expert colorists are here to help you find the shade that makes you shine.",
         buttonText: "Explore Coloring Services"
     }
-]
+];
 
 
 const HeroSection = () => {
+    const [heroSlides, setHeroSlides] = React.useState<typeof initialHeroSlides>([]);
+    
+    React.useEffect(() => {
+        setHeroSlides(initialHeroSlides);
+    }, []);
+
     const plugin = React.useRef(
         Autoplay({ delay: 20000, stopOnInteraction: true })
     )
+    
+    if (heroSlides.length === 0) {
+        return <section className="relative h-[70vh] min-h-[450px] w-full bg-muted animate-pulse"></section>;
+    }
 
     return (
         <section className="relative h-[70vh] min-h-[450px] w-full">
