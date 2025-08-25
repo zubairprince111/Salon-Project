@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -6,10 +7,18 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Sparkles, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useCart } from '@/context/cart-context';
+import { Badge } from '@/components/ui/badge';
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { items } = useCart();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,6 +54,8 @@ export function Header() {
       ))}
     </>
   );
+  
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <header className={cn("sticky top-0 z-50 w-full transition-all duration-300", scrolled ? "bg-card/80 backdrop-blur-sm shadow-md" : "bg-transparent")}>
@@ -58,17 +69,27 @@ export function Header() {
           <Button asChild>
             <Link href="/checkout">Book Now</Link>
           </Button>
-           <Button asChild variant="outline" size="icon">
+           <Button asChild variant="outline" size="icon" className="relative">
               <Link href="/checkout">
                   <ShoppingCart className="h-4 w-4"/>
+                  {isClient && totalItems > 0 && (
+                     <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-1 text-xs">
+                        {totalItems}
+                    </Badge>
+                  )}
                   <span className="sr-only">View Booking Cart</span>
               </Link>
            </Button>
         </nav>
         <div className="md:hidden flex items-center gap-2">
-            <Button asChild variant="outline" size="icon">
+            <Button asChild variant="outline" size="icon" className="relative">
               <Link href="/checkout">
                   <ShoppingCart className="h-4 w-4"/>
+                   {isClient && totalItems > 0 && (
+                     <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-1 text-xs">
+                        {totalItems}
+                    </Badge>
+                  )}
                   <span className="sr-only">View Booking Cart</span>
               </Link>
            </Button>

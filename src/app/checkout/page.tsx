@@ -1,7 +1,6 @@
 
 "use client";
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -14,23 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Separator } from '@/components/ui/separator';
 import { useToast } from "@/hooks/use-toast";
 import { Trash2 } from 'lucide-react';
-
-// Mock cart items for now. This will be replaced by a context.
-const initialCartItems = [
-    {
-        id: "1",
-        name: "Precision Haircut & Style",
-        price: 6500,
-        quantity: 1,
-    },
-    {
-        id: "2",
-        name: "Luxury Manicure & Pedicure",
-        price: 5000,
-        quantity: 1,
-    }
-];
-
+import { useCart } from '@/context/cart-context';
 
 const checkoutSchema = z.object({
   name: z.string().min(2, "Name is required."),
@@ -40,7 +23,7 @@ const checkoutSchema = z.object({
 
 export default function CheckoutPage() {
   const { toast } = useToast();
-  const [cartItems, setCartItems] = useState(initialCartItems);
+  const { items, removeItem, clearCart } = useCart();
 
   const form = useForm<z.infer<typeof checkoutSchema>>({
     resolver: zodResolver(checkoutSchema),
@@ -51,19 +34,18 @@ export default function CheckoutPage() {
     },
   });
 
-  const total = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
-  const removeItem = (id: string) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
-  }
+  const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   function onSubmit(values: z.infer<typeof checkoutSchema>) {
-    console.log(values);
+    console.log("Form values:", values);
+    console.log("Cart items:", items);
+    
     toast({
         title: "Booking Confirmed!",
         description: "Thank you for your booking. We will contact you shortly.",
     });
-    setCartItems([]);
+    
+    clearCart();
     form.reset();
   }
 
@@ -85,11 +67,11 @@ export default function CheckoutPage() {
                         <CardTitle>Your Booking</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {cartItems.length === 0 ? (
+                        {items.length === 0 ? (
                             <p className="text-muted-foreground">Your booking cart is empty.</p>
                         ) : (
                             <div className="space-y-4">
-                                {cartItems.map(item => (
+                                {items.map(item => (
                                     <div key={item.id} className="flex justify-between items-center">
                                         <div>
                                             <p className="font-semibold">{item.name}</p>
@@ -157,7 +139,7 @@ export default function CheckoutPage() {
                                   </FormItem>
                                 )}
                               />
-                              <Button type="submit" size="lg" className="w-full" disabled={cartItems.length === 0}>
+                              <Button type="submit" size="lg" className="w-full" disabled={items.length === 0}>
                                     Confirm & Book Now
                               </Button>
                             </form>

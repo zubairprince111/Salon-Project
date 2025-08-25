@@ -1,3 +1,6 @@
+
+"use client";
+
 import Image from "next/image";
 import { Header } from "@/components/glamora/header";
 import { Footer } from "@/components/glamora/footer";
@@ -23,31 +26,38 @@ import {
   PlusCircle,
 } from "lucide-react";
 import { StyleRecommender } from "@/components/glamora/style-recommender";
+import { useCart, CartItem } from "@/context/cart-context";
+import { useToast } from "@/hooks/use-toast";
+
 
 const services = [
   {
+    id: "1",
     icon: <Scissors className="w-10 h-10 text-primary" />,
     name: "Precision Haircut & Style",
     description: "A tailored cut and style to perfectly frame your face and match your lifestyle.",
-    price: "৳6500+",
+    price: 6500,
   },
   {
+    id: "2",
     icon: <Paintbrush className="w-10 h-10 text-primary" />,
     name: "Luxury Manicure & Pedicure",
     description: "Indulge in a relaxing treatment that leaves your nails flawlessly polished.",
-    price: "৳5000+",
+    price: 5000,
   },
   {
+    id: "3",
     icon: <Droplets className="w-10 h-10 text-primary" />,
     name: "Revitalizing Facial",
     description: "A custom facial using premium products to rejuvenate and nourish your skin.",
-    price: "৳10000+",
+    price: 10000,
   },
   {
+    id: "4",
     icon: <Sparkles className="w-10 h-10 text-primary" />,
     name: "Professional Makeup",
     description: "Get a stunning look for any special occasion, applied by our expert makeup artists.",
-    price: "৳7500+",
+    price: 7500,
   },
 ];
 
@@ -97,41 +107,54 @@ const HeroSection = () => (
   </section>
 );
 
-const ServicesSection = () => (
-  <section id="services" className="py-20 md:py-32">
-    <div className="container mx-auto px-4 md:px-6">
-      <div className="text-center mb-12">
-        <h2 className="font-headline text-3xl md:text-4xl font-bold">
-          Our Signature Services
-        </h2>
-        <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
-          Discover our range of premium services designed to make you look and
-          feel your best.
-        </p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {services.map((service) => (
-          <Card key={service.name} className="group flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2">
-            <CardContent className="p-6 text-center flex flex-col flex-grow">
-              <div className="flex justify-center mb-4">{service.icon}</div>
-              <h3 className="font-headline text-xl font-semibold mb-2">{service.name}</h3>
-              <p className="text-muted-foreground text-sm mb-4 flex-grow">
-                {service.description}
-              </p>
-              <p className="font-semibold text-primary">{service.price}</p>
-            </CardContent>
-            <CardFooter className="p-4 bg-card/50">
-                <Button className="w-full">
-                    <PlusCircle className="mr-2 h-4 w-4"/>
-                    Add to Booking
-                </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
-    </div>
-  </section>
-);
+const ServicesSection = () => {
+    const { addItem } = useCart();
+    const { toast } = useToast();
+
+    const handleAddToBooking = (service: Omit<CartItem, 'quantity'>) => {
+        addItem({ ...service, quantity: 1 });
+        toast({
+            title: "Added to Booking",
+            description: `${service.name} has been added to your booking cart.`,
+        });
+    };
+
+    return (
+      <section id="services" className="py-20 md:py-32">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center mb-12">
+            <h2 className="font-headline text-3xl md:text-4xl font-bold">
+              Our Signature Services
+            </h2>
+            <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
+              Discover our range of premium services designed to make you look and
+              feel your best.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {services.map((service) => (
+              <Card key={service.id} className="group flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2">
+                <CardContent className="p-6 text-center flex flex-col flex-grow">
+                  <div className="flex justify-center mb-4">{service.icon}</div>
+                  <h3 className="font-headline text-xl font-semibold mb-2">{service.name}</h3>
+                  <p className="text-muted-foreground text-sm mb-4 flex-grow">
+                    {service.description}
+                  </p>
+                  <p className="font-semibold text-primary">৳{service.price.toFixed(2)}</p>
+                </CardContent>
+                <CardFooter className="p-4 bg-card/50">
+                    <Button className="w-full" onClick={() => handleAddToBooking(service)}>
+                        <PlusCircle className="mr-2 h-4 w-4"/>
+                        Add to Booking
+                    </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+};
 
 const AboutSection = () => (
   <section id="about" className="bg-card/50 py-20 md:py-32">
