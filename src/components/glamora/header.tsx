@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Sparkles } from 'lucide-react';
+import { Menu, Sparkles, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Header() {
@@ -20,11 +20,11 @@ export function Header() {
   }, []);
 
   const navLinks = [
-    { href: '#services', label: 'Services' },
-    { href: '#about', label: 'About Us' },
-    { href: '#style-recommender', label: 'AI Stylist' },
-    { href: '#testimonials', label: 'Testimonials' },
-    { href: '#contact', label: 'Contact' },
+    { href: '/#services', label: 'Services' },
+    { href: '/#about', label: 'About Us' },
+    { href: '/#style-recommender', label: 'AI Stylist' },
+    { href: '/#testimonials', label: 'Testimonials' },
+    { href: '/#contact', label: 'Contact' },
   ];
 
   const handleLinkClick = () => {
@@ -55,9 +55,23 @@ export function Header() {
         </Link>
         <nav className="hidden md:flex items-center gap-6">
           <NavItems />
-          <Button>Book Now</Button>
+          <Button asChild>
+            <Link href="/checkout">Book Now</Link>
+          </Button>
+           <Button asChild variant="outline" size="icon">
+              <Link href="/checkout">
+                  <ShoppingCart className="h-4 w-4"/>
+                  <span className="sr-only">View Booking Cart</span>
+              </Link>
+           </Button>
         </nav>
-        <div className="md:hidden">
+        <div className="md:hidden flex items-center gap-2">
+            <Button asChild variant="outline" size="icon">
+              <Link href="/checkout">
+                  <ShoppingCart className="h-4 w-4"/>
+                  <span className="sr-only">View Booking Cart</span>
+              </Link>
+           </Button>
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -74,7 +88,9 @@ export function Header() {
                 <div className="flex flex-col gap-4">
                   <NavItems />
                 </div>
-                <Button className="mt-4" onClick={handleLinkClick}>Book Now</Button>
+                <Button className="mt-4" onClick={handleLinkClick} asChild>
+                    <Link href="/checkout">Book Now</Link>
+                </Button>
               </div>
             </SheetContent>
           </Sheet>

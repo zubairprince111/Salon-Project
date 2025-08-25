@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Header } from "@/components/glamora/header";
 import { Footer } from "@/components/glamora/footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
@@ -20,6 +20,7 @@ import {
   MapPin,
   Phone,
   Mail,
+  PlusCircle,
 } from "lucide-react";
 import { StyleRecommender } from "@/components/glamora/style-recommender";
 
@@ -110,15 +111,21 @@ const ServicesSection = () => (
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {services.map((service) => (
-          <Card key={service.name} className="group overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2">
-            <CardContent className="p-6 text-center">
+          <Card key={service.name} className="group flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2">
+            <CardContent className="p-6 text-center flex flex-col flex-grow">
               <div className="flex justify-center mb-4">{service.icon}</div>
               <h3 className="font-headline text-xl font-semibold mb-2">{service.name}</h3>
-              <p className="text-muted-foreground text-sm mb-4">
+              <p className="text-muted-foreground text-sm mb-4 flex-grow">
                 {service.description}
               </p>
               <p className="font-semibold text-primary">{service.price}</p>
             </CardContent>
+            <CardFooter className="p-4 bg-card/50">
+                <Button className="w-full">
+                    <PlusCircle className="mr-2 h-4 w-4"/>
+                    Add to Booking
+                </Button>
+            </CardFooter>
           </Card>
         ))}
       </div>
