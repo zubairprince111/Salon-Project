@@ -23,7 +23,14 @@ import {
   Mail,
   PlusCircle,
   HeartHandshake,
-  ChevronDown
+  ChevronDown,
+  Scissors,
+  Droplets,
+  Sparkles,
+  Paintbrush,
+  Palette,
+  Gem,
+  PenTool
 } from "lucide-react";
 import { StyleRecommender } from "@/components/glamora/style-recommender";
 import { useCart, CartItem } from "@/context/cart-context";
@@ -36,17 +43,17 @@ const testimonials = [
   {
     quote: "Glamora is my go-to salon! The atmosphere is so relaxing and luxurious. I always leave feeling beautiful and refreshed. The staff is incredibly talented and friendly.",
     name: "Jessica Miller",
-    avatar: "https://placehold.co/100x100.png",
+    avatar: "https://drive.google.com/uc?export=view&id=17UD0ZUjVnUjR2In6hBxsK3oiVjPNkDHs",
   },
   {
     quote: "I had the most amazing facial at Glamora. My skin has never felt so soft and looked so radiant. The esthetician was so knowledgeable and customized the treatment for me.",
     name: "Samantha Chen",
-    avatar: "https://placehold.co/100x101.png",
+    avatar: "https://drive.google.com/uc?export=view&id=15dv-g5nbJQIp3lvqZKKrRW-hL_zPcVkc",
   },
   {
     quote: "The best haircut I've ever had! The stylist really listened to what I wanted and gave me a cut that's easy to manage and looks fantastic. Highly recommend!",
     name: "Emily Rodriguez",
-    avatar: "https://placehold.co/100x102.png",
+    avatar: "https://drive.google.com/uc?export=view&id=1xTsPUOGueFppoLrX1fJropzrjwBkrXMQ",
   },
 ];
 
@@ -54,7 +61,7 @@ const testimonials = [
 const heroSlides = [
     {
         image: {
-            src: "https://placehold.co/1600x900.png",
+            src: "https://drive.google.com/uc?export=view&id=1dOWY5mm6lhHD6Bky5Y_ztPc7fXjAv3uV",
             alt: "Interior of a luxury beauty salon",
             aiHint: "salon interior"
         },
@@ -224,7 +231,7 @@ const AboutSection = () => (
         </div>
         <div className="order-1 md:order-2">
           <Image
-            src="https://drive.google.com/uc?export=view&id=1HCjijULKJX-59onLV93umMyy_yyNhMj1"
+            src="https://drive.google.com/uc?export=view&id=12tLm2CSHLjc-CMot0vPBICtpTE_zpfWQ"
             alt="A beautician at work in a stylish salon"
             data-ai-hint="beautician working"
             width={600}
@@ -313,7 +320,7 @@ const ContactSection = () => (
       <div className="grid md:grid-cols-2 gap-12 items-center">
         <div className="w-full">
           <Image
-            src="https://placehold.co/600x450.png"
+            src="https://drive.google.com/uc?export=view&id=1VJb9Uo3tsdGLe7uVhmbIRl4YV_W4BuyU"
             alt="Map showing salon location"
             data-ai-hint="map city"
             width={600}
@@ -370,5 +377,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
