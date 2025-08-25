@@ -24,6 +24,10 @@ import {
   Phone,
   Mail,
   PlusCircle,
+  Palette,
+  Gem,
+  HeartHandshake,
+  PenTool,
 } from "lucide-react";
 import { StyleRecommender } from "@/components/glamora/style-recommender";
 import { useCart, CartItem } from "@/context/cart-context";
@@ -58,6 +62,34 @@ const services = [
     name: "Professional Makeup",
     description: "Get a stunning look for any special occasion, applied by our expert makeup artists.",
     price: 7500,
+  },
+  {
+    id: "5",
+    icon: <Palette className="w-10 h-10 text-primary" />,
+    name: "Radiant Hair Coloring",
+    description: "From subtle highlights to bold new colors, our experts will find the perfect shade for you.",
+    price: 8500,
+  },
+  {
+    id: "6",
+    icon: <Gem className="w-10 h-10 text-primary" />,
+    name: "Bridal Glow Package",
+    description: "A complete package including makeup, hair, and a pre-wedding facial for your special day.",
+    price: 25000,
+  },
+  {
+    id: "7",
+    icon: <HeartHandshake className="w-10 h-10 text-primary" />,
+    name: "Deep Tissue Massage",
+    description: "Release tension and soothe sore muscles with our therapeutic deep tissue massage.",
+    price: 6000,
+  },
+  {
+    id: "8",
+    icon: <PenTool className="w-10 h-10 text-primary" />,
+    name: "Expert Brow Shaping",
+    description: "Perfectly sculpted eyebrows to define your features, using threading or waxing.",
+    price: 1500,
   },
 ];
 
