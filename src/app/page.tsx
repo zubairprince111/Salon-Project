@@ -21,7 +21,6 @@ import {
   Phone,
   Mail,
 } from "lucide-react";
-import { AiGallery } from "@/components/glamora/ai-gallery";
 
 const services = [
   {
@@ -283,7 +282,6 @@ export default function Home() {
         <HeroSection />
         <ServicesSection />
         <AboutSection />
-        <AiGallery />
         <TestimonialsSection />
         <ContactSection />
       </main>

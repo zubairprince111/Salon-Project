@@ -22,7 +22,6 @@ export function Header() {
   const navLinks = [
     { href: '#services', label: 'Services' },
     { href: '#about', label: 'About Us' },
-    { href: '#ai-gallery', label: 'AI Gallery' },
     { href: '#testimonials', label: 'Testimonials' },
     { href: '#contact', label: 'Contact' },
   ];
