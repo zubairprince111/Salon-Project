@@ -224,7 +224,7 @@ const AboutSection = () => (
         </div>
         <div className="order-1 md:order-2">
           <Image
-            src="https://placehold.co/600x700.png"
+            src="https://drive.google.com/uc?export=view&id=1HCjijULKJX-59onLV93umMyy_yyNhMj1"
             alt="A beautician at work in a stylish salon"
             data-ai-hint="beautician working"
             width={600}
