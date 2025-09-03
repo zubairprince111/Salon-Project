@@ -18,11 +18,11 @@ export function Footer() {
           <div className="text-center md:justify-self-center">
             <h4 className="font-headline font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#services" className="hover:text-primary transition-colors">Services</Link></li>
-              <li><Link href="#about" className="hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link href="#style-recommender" className="hover:text-primary transition-colors">AI Stylist</Link></li>
-              <li><Link href="#testimonials" className="hover:text-primary transition--colors">Testimonials</Link></li>
-              <li><Link href="#contact" className="hover:text-primary transition-colors">Contact</Link></li>
+              <li><Link href="/#services" className="hover:text-primary transition-colors">Services</Link></li>
+              <li><Link href="/#about" className="hover:text-primary transition-colors">About Us</Link></li>
+              <li><Link href="/#style-recommender" className="hover:text-primary transition-colors">AI Stylist</Link></li>
+              <li><Link href="/#testimonials" className="hover:text-primary transition--colors">Testimonials</Link></li>
+              <li><Link href="/#contact" className="hover:text-primary transition-colors">Contact</Link></li>
             </ul>
           </div>
           <div className="flex flex-col items-center md:items-end">
@@ -41,7 +41,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-8 border-t pt-6 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Glamora. All Rights Reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Glamora. All Rights Reserved. | <Link href="/admin/login" className="hover:text-primary">Admin</Link></p>
         </div>
       </div>
     </footer>

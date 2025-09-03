@@ -1,5 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApp, getApps } from "firebase/app";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -14,5 +15,28 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+
+// One-time setup: Create admin user (run this once)
+const setupAdmin = async () => {
+    try {
+        const auth = getAuth(app);
+        // IMPORTANT: Change this password in your Firebase Console after creation
+        await createUserWithEmailAndPassword(auth, 'admin@glamora.com', 'adminpassword');
+        console.log('Admin user created successfully. Please change the password in the Firebase Authentication console.');
+    } catch (error: any) {
+        if (error.code === 'auth/email-already-in-use') {
+            console.log('Admin user already exists.');
+        } else {
+            console.error('Error creating admin user:', error);
+        }
+    }
+}
+
+// Call this function to ensure the admin user exists when the app starts.
+// In a real production app, you might do this in a separate setup script.
+if (typeof window !== 'undefined') {
+    setupAdmin();
+}
+
 
 export { app };
