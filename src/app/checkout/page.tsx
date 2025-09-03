@@ -322,7 +322,7 @@ export default function CheckoutPage() {
                                         <FormItem>
                                             <FormControl>
                                                 <RadioGroup
-                                                    onValuecha<ctrl61>ge={field.onChange}
+                                                    onValueChange={field.onChange}
                                                     defaultValue={field.value}
                                                     className="grid md:grid-cols-3 gap-4"
                                                 >
@@ -409,5 +409,3 @@ export default function CheckoutPage() {
     </div>
   );
 }
-
-    
