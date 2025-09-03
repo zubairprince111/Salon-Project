@@ -18,36 +18,66 @@ interface Booking {
     bookedat: Timestamp;
 }
 
+interface Payment {
+    id: string;
+    bookingid: string;
+    amount: number;
+    currency: string;
+}
+
+interface BookingWithPayment extends Booking {
+    payment?: Payment;
+}
+
+
 export function BookingList() {
-    const [bookings, setBookings] = useState<Booking[]>([]);
+    const [bookings, setBookings] = useState<BookingWithPayment[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchBookings = async () => {
+        const fetchBookingsAndPayments = async () => {
             setLoading(true);
             try {
                 const db = getFirestore(app);
-                const bookingsCollection = collection(db, 'bookings');
-                const q = query(bookingsCollection, orderBy('bookedat', 'desc'));
-                const bookingSnapshot = await getDocs(q);
                 
+                // Fetch bookings
+                const bookingsCollection = collection(db, 'bookings');
+                const bookingsQuery = query(bookingsCollection, orderBy('bookedat', 'desc'));
+                const bookingSnapshot = await getDocs(bookingsQuery);
                 const bookingsList = bookingSnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 })) as Booking[];
+
+                // Fetch payments
+                const paymentsCollection = collection(db, 'payments');
+                const paymentSnapshot = await getDocs(paymentsCollection);
+                const paymentsList = paymentSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                })) as Payment[];
+
+                // Create a map of payments by booking ID for easy lookup
+                const paymentsMap = new Map(paymentsList.map(p => [p.bookingid, p]));
                 
-                setBookings(bookingsList);
+                // Combine bookings with their payments
+                const combinedBookings = bookingsList.map(booking => ({
+                    ...booking,
+                    payment: paymentsMap.get(booking.id)
+                }));
+
+                setBookings(combinedBookings);
                 setError(null);
             } catch (e) {
-                console.error("Error fetching bookings: ", e);
-                setError("Failed to load bookings.");
+                console.error("Error fetching data: ", e);
+                setError("Failed to load bookings or payments.");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchBookings();
+        fetchBookingsAndPayments();
     }, []);
 
     if (loading) {
@@ -74,6 +104,7 @@ export function BookingList() {
                     <TableHead>Appointment</TableHead>
                     <TableHead>Customer (User ID)</TableHead>
                     <TableHead>Service(s)</TableHead>
+                    <TableHead>Amount</TableHead>
                     <TableHead>Booked At</TableHead>
                     <TableHead>Status</TableHead>
                 </TableRow>
@@ -96,6 +127,9 @@ export function BookingList() {
                         </TableCell>
                         <TableCell>
                             {booking.servicename}
+                        </TableCell>
+                        <TableCell>
+                            {booking.payment ? `৳${booking.payment.amount.toFixed(2)}` : 'N/A'}
                         </TableCell>
                          <TableCell>
                              {booking.bookedat ? format(booking.bookedat.toDate(), 'PPP p') : 'N/A'}
