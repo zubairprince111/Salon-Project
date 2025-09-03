@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -14,6 +15,7 @@ import { Loader2 } from 'lucide-react';
 
 
 export default function AdminLoginPage() {
+    const [email, setEmail] = useState('admin@glamora.com');
     const [password, setPassword] = useState('');
     const { login, loading, user } = useAuth();
     const router = useRouter();
@@ -28,12 +30,12 @@ export default function AdminLoginPage() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await login('admin@glamora.com', password);
+            await login(email, password);
             router.push('/admin/dashboard');
         } catch (error: any) {
             toast({
                 title: "Login Failed",
-                description: "The password you entered is incorrect. Please try again.",
+                description: "The email or password you entered is incorrect. Please try again.",
                 variant: "destructive"
             });
             console.error(error);
@@ -47,10 +49,21 @@ export default function AdminLoginPage() {
                 <Card className="w-full max-w-md shadow-lg">
                     <CardHeader className="text-center">
                         <CardTitle className="font-headline text-3xl">Admin Login</CardTitle>
-                        <CardDescription>Enter the password to access the admin dashboard.</CardDescription>
+                        <CardDescription>Enter your credentials to access the admin dashboard.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleLogin} className="space-y-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="email">Email</Label>
+                                <Input 
+                                    id="email" 
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="admin@glamora.com"
+                                    required 
+                                />
+                            </div>
                             <div className="space-y-2">
                                 <Label htmlFor="password">Password</Label>
                                 <Input 
