@@ -43,6 +43,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const logout = async () => {
         setLoading(true);
         await signOut(auth);
+        // After signing out, the onAuthStateChanged listener will automatically
+        // update the user state to null and setLoading to false.
     };
 
     const value = { user, loading, login, logout };

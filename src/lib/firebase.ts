@@ -1,6 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApp, getApps } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -15,6 +17,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const db = getFirestore(app);
 
 // One-time setup: Create admin user (run this once)
 const setupAdmin = async () => {
@@ -26,6 +29,7 @@ const setupAdmin = async () => {
     } catch (error: any) {
         if (error.code === 'auth/email-already-in-use') {
             // This is expected if the user already exists, so we can ignore it.
+            console.log('Admin user already exists.');
         } else {
             console.error('Error creating admin user:', error);
         }
@@ -33,4 +37,4 @@ const setupAdmin = async () => {
 }
 
 
-export { app, setupAdmin };
+export { app, db, setupAdmin };
