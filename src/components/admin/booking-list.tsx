@@ -107,9 +107,8 @@ export function BookingList() {
                     <TableHead>Appointment</TableHead>
                     <TableHead>Customer (User ID)</TableHead>
                     <TableHead>Service(s)</TableHead>
-                    <TableHead>Payment</TableHead>
                     <TableHead>Booked At</TableHead>
-                    <TableHead className="text-center">Status</TableHead>
+                    <TableHead>Status & Payment</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -131,23 +130,23 @@ export function BookingList() {
                         <TableCell>
                             {booking.servicename}
                         </TableCell>
-                        <TableCell>
-                            <div className="flex items-center capitalize">
-                                <PaymentMethodIcon method={booking.paymentMethod} />
-                                {booking.paymentMethod}
-                            </div>
-                         </TableCell>
                          <TableCell>
                              {booking.bookedat ? format(booking.bookedat.toDate(), 'PPP p') : 'N/A'}
                          </TableCell>
-                        <TableCell className="text-center">
-                            <Badge variant={
-                                booking.status === 'completed' ? 'default' : 
-                                booking.status === 'confirmed' ? 'secondary' :
-                                booking.status === 'pending' ? 'outline' : 'destructive'
-                            } className="capitalize">
-                                {booking.status}
-                            </Badge>
+                        <TableCell>
+                            <div className="flex items-center gap-2">
+                                <Badge variant={
+                                    booking.status === 'completed' ? 'default' : 
+                                    booking.status === 'confirmed' ? 'secondary' :
+                                    booking.status === 'pending' ? 'outline' : 'destructive'
+                                } className="capitalize">
+                                    {booking.status}
+                                </Badge>
+                                <div className="flex items-center capitalize text-muted-foreground">
+                                    <PaymentMethodIcon method={booking.paymentMethod} />
+                                    {booking.paymentMethod}
+                                </div>
+                            </div>
                         </TableCell>
                     </TableRow>
                 ))}
