@@ -16,10 +16,11 @@ import { Loader2 } from 'lucide-react';
 
 export default function AdminLoginPage() {
     const [email, setEmail] = useState('admin@glamora.com');
-    const [password, setPassword] = useState('');
+    const [password, setPassword] = useState('adminpassword');
     const { login, loading, user } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if(user) {
@@ -29,6 +30,7 @@ export default function AdminLoginPage() {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsSubmitting(true);
         try {
             await login(email, password);
             router.push('/admin/dashboard');
@@ -39,9 +41,26 @@ export default function AdminLoginPage() {
                 variant: "destructive"
             });
             console.error(error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
     
+    if (loading) {
+        return (
+             <div className="flex flex-col min-h-dvh bg-background text-foreground">
+                <Header />
+                <main className="flex-grow container mx-auto px-4 md:px-6 py-12 md:py-24 flex items-center justify-center">
+                    <div className="text-center flex items-center gap-4">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="text-muted-foreground">Initializing...</p>
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        )
+    }
+
     return (
         <div className="flex flex-col min-h-dvh bg-background text-foreground">
             <Header />
@@ -62,6 +81,7 @@ export default function AdminLoginPage() {
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="admin@glamora.com"
                                     required 
+                                    disabled={isSubmitting}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -73,10 +93,11 @@ export default function AdminLoginPage() {
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="••••••••"
                                     required 
+                                    disabled={isSubmitting}
                                 />
                             </div>
-                            <Button type="submit" className="w-full" disabled={loading}>
-                                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            <Button type="submit" className="w-full" disabled={isSubmitting}>
+                                 {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                                 Login
                             </Button>
                         </form>

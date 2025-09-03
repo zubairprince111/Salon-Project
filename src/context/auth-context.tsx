@@ -1,8 +1,11 @@
+
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, User, signOut } from "firebase/auth";
-import { app, setupAdmin } from '@/lib/firebase';
+import { User, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebase/auth";
+import { auth, setupAdmin } from '@/lib/firebase';
+import { usePathname, useRouter } from 'next/navigation';
+
 
 interface AuthContextType {
     user: User | null;
@@ -14,12 +17,17 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Call setupAdmin once when the app loads to ensure the admin user exists.
-setupAdmin();
+// This is a self-invoking async function.
+(async () => {
+  await setupAdmin();
+})();
+
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
-    const auth = getAuth(app);
+    const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -28,24 +36,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
         
         return () => unsubscribe();
-    }, [auth]);
+    }, []);
 
     const login = async (email: string, password: string) => {
-        setLoading(true);
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-            setLoading(false); 
-            throw error;
-        }
+       setLoading(true);
+       try {
+           await signInWithEmailAndPassword(auth, email, password);
+           // onAuthStateChanged will handle the user state update
+       } catch (error) {
+           console.error("Login failed:", error);
+           setLoading(false);
+           throw error; // Re-throw to be caught in the component
+       }
     };
 
     const logout = async () => {
-        setLoading(true);
         await signOut(auth);
-        // After signing out, the onAuthStateChanged listener will automatically
-        // update the user state to null and setLoading to false.
+        setUser(null);
+        router.push('/admin/login');
     };
+    
+    // This effect handles route protection
+    useEffect(() => {
+        if (!loading && !user && pathname === '/admin/dashboard') {
+            router.push('/admin/login');
+        }
+    }, [user, loading, pathname, router]);
 
     const value = { user, loading, login, logout };
 

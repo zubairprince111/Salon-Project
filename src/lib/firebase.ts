@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApp, getApps } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 
@@ -18,23 +18,33 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
+const auth = getAuth(app);
+
 
 // One-time setup: Create admin user (run this once)
 const setupAdmin = async () => {
     try {
-        const auth = getAuth(app);
-        // IMPORTANT: Change this password in your Firebase Console after creation
-        await createUserWithEmailAndPassword(auth, 'admin@glamora.com', 'adminpassword');
-        console.log('Admin user created successfully. Please change the password in the Firebase Authentication console.');
+        // Attempt to sign in first to see if the user exists
+        await signInWithEmailAndPassword(auth, 'admin@glamora.com', 'adminpassword');
+        console.log('Admin user already exists.');
     } catch (error: any) {
-        if (error.code === 'auth/email-already-in-use') {
-            // This is expected if the user already exists, so we can ignore it.
-            console.log('Admin user already exists.');
-        } else {
-            console.error('Error creating admin user:', error);
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+            // If user doesn't exist or password is wrong (e.g. was changed), create it.
+            try {
+                await createUserWithEmailAndPassword(auth, 'admin@glamora.com', 'adminpassword');
+                console.log('Admin user created successfully. Please change the password in the Firebase Authentication console for security.');
+            } catch (createError: any) {
+                if (createError.code === 'auth/email-already-in-use') {
+                     console.log('Admin user already exists.');
+                } else {
+                    console.error('Error creating admin user:', createError);
+                }
+            }
+        } else if (error.code !== 'auth/too-many-requests') {
+             console.error('Error checking admin user:', error);
         }
     }
 }
 
 
-export { app, db, setupAdmin };
+export { app, db, auth, setupAdmin };
