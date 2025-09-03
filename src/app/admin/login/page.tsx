@@ -23,24 +23,32 @@ export default function AdminLoginPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        if(user) {
+        if (!loading && user) {
             router.push('/admin/dashboard');
         }
-    }, [user, router]);
+    }, [user, loading, router]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        if(!email || !password) {
+             toast({
+                title: "Login Failed",
+                description: "Please enter both email and password.",
+                variant: "destructive"
+            });
+            return;
+        }
         setIsSubmitting(true);
         try {
             await login(email, password);
-            router.push('/admin/dashboard');
+            // The useEffect will handle redirection on successful login
         } catch (error: any) {
+            console.error("Login Error Code:", error.code);
             toast({
                 title: "Login Failed",
                 description: "The email or password you entered is incorrect. Please try again.",
                 variant: "destructive"
             });
-            console.error(error);
         } finally {
             setIsSubmitting(false);
         }
@@ -54,6 +62,22 @@ export default function AdminLoginPage() {
                     <div className="text-center flex items-center gap-4">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         <p className="text-muted-foreground">Initializing...</p>
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        )
+    }
+    
+    // If user is already logged in, don't render the form, let useEffect redirect
+    if (user) {
+         return (
+             <div className="flex flex-col min-h-dvh bg-background text-foreground">
+                <Header />
+                <main className="flex-grow container mx-auto px-4 md:px-6 py-12 md:py-24 flex items-center justify-center">
+                    <div className="text-center flex items-center gap-4">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="text-muted-foreground">Redirecting to Dashboard...</p>
                     </div>
                 </main>
                 <Footer />
