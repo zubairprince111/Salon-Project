@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { app } from '@/lib/firebase';
-import { getFirestore, collection, getDocs, query, where, Timestamp } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, Timestamp } from 'firebase/firestore';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, CreditCard, Smartphone, Store } from 'lucide-react';
@@ -16,7 +16,7 @@ interface Booking {
     timeslot: Timestamp;
     status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
     bookedat: Timestamp;
-    paymentMethod?: string; // Optional field
+    paymentMethod?: string;
 }
 
 interface Payment {
@@ -34,7 +34,7 @@ export function BookingList() {
             try {
                 const db = getFirestore(app);
                 
-                // Fetch all bookings
+                // 1. Fetch all bookings
                 const bookingsCollection = collection(db, 'bookings');
                 const bookingSnapshot = await getDocs(bookingsCollection);
                 const bookingsList = bookingSnapshot.docs.map(doc => ({
@@ -42,23 +42,22 @@ export function BookingList() {
                     ...doc.data()
                 })) as Omit<Booking, 'paymentMethod'>[];
 
-                // Fetch all payments
+                // 2. Fetch all payments
                 const paymentsCollection = collection(db, 'payments');
                 const paymentSnapshot = await getDocs(paymentsCollection);
                 const paymentsList = paymentSnapshot.docs.map(doc => doc.data() as Payment);
                 
-                // Create a map of bookingId to paymentMethod for easy lookup
+                // 3. Create a map of bookingId -> paymentMethod
                 const paymentMethodMap = new Map<string, string>();
                 paymentsList.forEach(payment => {
                     paymentMethodMap.set(payment.bookingid, payment.paymentmethod);
                 });
 
-                // Combine booking with payment method
+                // 4. Combine booking with payment method
                 const combinedBookings = bookingsList.map(booking => ({
                     ...booking,
-                    paymentMethod: paymentMethodMap.get(booking.id) || 'N/A'
-                })).sort((a, b) => b.bookedat.toMillis() - a.bookedat.toMillis());
-
+                    paymentMethod: paymentMethodMap.get(booking.id) || 'N/A' // Set a default if no payment found
+                })).sort((a, b) => b.bookedat.toMillis() - a.bookedat.toMillis()); // Sort by most recent booking
 
                 setBookings(combinedBookings);
 
@@ -142,7 +141,7 @@ export function BookingList() {
                                 } className="capitalize">
                                     {booking.status}
                                 </Badge>
-                                <div className="flex items-center capitalize text-muted-foreground">
+                                <div className="flex items-center capitalize text-muted-foreground text-sm">
                                     <PaymentMethodIcon method={booking.paymentMethod} />
                                     {booking.paymentMethod}
                                 </div>
