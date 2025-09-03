@@ -11,11 +11,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function AdminLoginPage() {
     const [email, setEmail] = useState('admin@glamora.com');
     const [password, setPassword] = useState('prince23103113');
+    const [showPassword, setShowPassword] = useState(false);
     const { login, loading, user } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
@@ -93,15 +94,29 @@ export default function AdminLoginPage() {
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="password">Password</Label>
-                                <Input 
-                                    id="password" 
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="••••••••"
-                                    required 
-                                    disabled={isSubmitting}
-                                />
+                                <div className="relative">
+                                    <Input 
+                                        id="password" 
+                                        type={showPassword ? 'text' : 'password'}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="••••••••"
+                                        required 
+                                        disabled={isSubmitting}
+                                        className="pr-10"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="absolute inset-y-0 right-0 h-full px-3"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        disabled={isSubmitting}
+                                    >
+                                        {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                                        <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
+                                    </Button>
+                                </div>
                             </div>
                             <Button type="submit" className="w-full" disabled={isSubmitting}>
                                  {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
