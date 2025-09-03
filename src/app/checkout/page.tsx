@@ -14,6 +14,11 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from "@/hooks/use-toast";
 import { Trash2 } from 'lucide-react';
 import { useCart } from '@/context/cart-context';
+import { app } from '@/lib/firebase';
+import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
+
 
 const checkoutSchema = z.object({
   name: z.string().min(2, "Name is required."),
@@ -24,6 +29,7 @@ const checkoutSchema = z.object({
 export default function CheckoutPage() {
   const { toast } = useToast();
   const { items, removeItem, clearCart } = useCart();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof checkoutSchema>>({
     resolver: zodResolver(checkoutSchema),
@@ -36,17 +42,35 @@ export default function CheckoutPage() {
 
   const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  function onSubmit(values: z.infer<typeof checkoutSchema>) {
-    console.log("Form values:", values);
-    console.log("Cart items:", items);
-    
-    toast({
-        title: "Booking Confirmed!",
-        description: "Thank you for your booking. We will contact you shortly.",
-    });
-    
-    clearCart();
-    form.reset();
+  async function onSubmit(values: z.infer<typeof checkoutSchema>) {
+    setIsLoading(true);
+    try {
+      const db = getFirestore(app);
+      await addDoc(collection(db, "bookings"), {
+        ...values,
+        items: items.map(item => ({id: item.id, name: item.name, price: item.price, quantity: item.quantity})),
+        total,
+        createdAt: serverTimestamp(),
+        status: 'pending'
+      });
+
+      toast({
+          title: "Booking Confirmed!",
+          description: "Thank you for your booking. We will contact you shortly.",
+      });
+      
+      clearCart();
+      form.reset();
+    } catch (error) {
+      console.error("Error creating booking: ", error);
+       toast({
+          title: "Booking Failed",
+          description: "There was an error submitting your booking. Please try again.",
+          variant: "destructive"
+      });
+    } finally {
+        setIsLoading(false);
+    }
   }
 
   return (
@@ -108,8 +132,9 @@ export default function CheckoutPage() {
                                   </FormItem>
                                 )}
                               />
-                              <Button type="submit" size="lg" className="w-full" disabled={items.length === 0}>
-                                    Confirm & Book Now
+                              <Button type="submit" size="lg" className="w-full" disabled={items.length === 0 || isLoading}>
+                                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                    {isLoading ? 'Booking...' : 'Confirm & Book Now'}
                               </Button>
                             </form>
                         </Form>

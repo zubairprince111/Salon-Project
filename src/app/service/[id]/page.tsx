@@ -3,7 +3,7 @@
 
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import { services } from '@/lib/services';
+import { services } from '@/lib/services.tsx';
 import { Header } from "@/components/glamora/header";
 import { Footer } from "@/components/glamora/footer";
 import { Button } from '@/components/ui/button';
