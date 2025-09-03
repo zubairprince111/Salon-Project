@@ -61,7 +61,7 @@ export default function AdminLoginPage() {
                 <main className="flex-grow container mx-auto px-4 md:px-6 py-12 md:py-24 flex items-center justify-center">
                     <div className="text-center flex items-center gap-4">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        <p className="text-muted-foreground">Loading session...</p>
+                        <p className="text-muted-foreground">Redirecting to dashboard...</p>
                     </div>
                 </main>
                 <Footer />
@@ -105,17 +105,15 @@ export default function AdminLoginPage() {
                                         disabled={isSubmitting}
                                         className="pr-10"
                                     />
-                                    <Button
+                                    <button
                                         type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        className="absolute inset-y-0 right-0 h-full px-3"
+                                        className="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground"
                                         onClick={() => setShowPassword(!showPassword)}
                                         disabled={isSubmitting}
                                     >
-                                        {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                         <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
-                                    </Button>
+                                    </button>
                                 </div>
                             </div>
                             <Button type="submit" className="w-full" disabled={isSubmitting}>

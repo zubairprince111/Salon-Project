@@ -14,44 +14,39 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// This function will run once to ensure the admin user exists.
-const setupAdminUser = async () => {
-    // This is a simplified check. A more robust solution in a real app might involve a secure server-side check.
-    if (localStorage.getItem('adminSetupComplete')) {
-        return;
-    }
+async function setupAdminUser() {
     try {
-        // Attempt to create the user. If the user already exists, this will fail gracefully.
+        // This is a temporary solution for the purpose of this demo.
+        // In a real-world application, you would not hardcode credentials like this.
+        // You would use a secure method for initial user setup, likely a server-side script or a protected setup UI.
         await createUserWithEmailAndPassword(auth, 'admin@glamora.com', 'prince23103113');
-        console.log("Admin user created successfully.");
-        // Sign out immediately so the user isn't logged in after setup.
-        await signOut(auth);
+        console.log("Admin user created or already exists.");
     } catch (error: any) {
         if (error.code === 'auth/email-already-in-use') {
-            console.log("Admin user already exists.");
+           // This is expected and fine. It means the admin is already set up.
+           console.log("Admin user already exists.");
         } else {
-            console.error("Error during admin user setup:", error);
+            console.error("Error setting up admin user:", error);
         }
-    } finally {
-        // Mark setup as complete to prevent it from running again.
-        localStorage.setItem('adminSetupComplete', 'true');
     }
-};
+}
+
+let adminSetupPromise: Promise<void> | null = null;
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Run the setup function once when the app loads.
-        setupAdminUser();
+        if (!adminSetupPromise) {
+            adminSetupPromise = setupAdminUser();
+        }
 
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
             setLoading(false);
         });
         
-        // Cleanup subscription on unmount
         return () => unsubscribe();
     }, []);
 

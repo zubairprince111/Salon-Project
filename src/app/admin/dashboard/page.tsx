@@ -8,6 +8,7 @@ import { Footer } from "@/components/glamora/footer";
 import { Button } from "@/components/ui/button";
 import { BookingList } from "@/components/admin/booking-list";
 import { Loader2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function AdminDashboard() {
   const { user, loading, logout } = useAuth();
@@ -36,6 +37,7 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     await logout();
+    router.push('/admin/login');
   }
 
   return (
@@ -46,7 +48,14 @@ export default function AdminDashboard() {
           <h1 className="font-headline text-4xl md:text-5xl font-bold">Admin Dashboard</h1>
            <Button onClick={handleLogout}>Logout</Button>
         </div>
-        <BookingList />
+        <Card>
+            <CardHeader>
+                <CardTitle>All Bookings</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <BookingList />
+            </CardContent>
+        </Card>
       </main>
       <Footer />
     </div>
