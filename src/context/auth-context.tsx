@@ -2,7 +2,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebase/auth";
+import { User, onAuthStateChanged, signOut, signInWithEmailAndPassword, Auth } from "firebase/auth";
 import { auth } from '@/lib/firebase';
 
 interface AuthContextType {
@@ -29,12 +29,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const login = async (email: string, password: string) => {
        await signInWithEmailAndPassword(auth, email, password);
-       // onAuthStateChanged will handle setting the user and loading state
     };
 
     const logout = async () => {
         await signOut(auth);
-        // onAuthStateChanged will handle setting the user to null
     };
     
     const value = { user, loading, login, logout };
