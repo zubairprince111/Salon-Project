@@ -14,38 +14,44 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Function to create the admin user if it doesn't exist
+// This function will run once to ensure the admin user exists.
 const setupAdminUser = async () => {
+    // This is a simplified check. A more robust solution in a real app might involve a secure server-side check.
+    if (localStorage.getItem('adminSetupComplete')) {
+        return;
+    }
     try {
-        // We try to sign in first to see if the user exists.
-        await signInWithEmailAndPassword(auth, 'admin@glamora.com', 'prince23103113');
+        // Attempt to create the user. If the user already exists, this will fail gracefully.
+        await createUserWithEmailAndPassword(auth, 'admin@glamora.com', 'prince23103113');
+        console.log("Admin user created successfully.");
+        // Sign out immediately so the user isn't logged in after setup.
+        await signOut(auth);
     } catch (error: any) {
-        // If the user does not exist (auth/user-not-found), create it.
-        // Other errors will be caught here too but we primarily care about creating the user.
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-            try {
-                await createUserWithEmailAndPassword(auth, 'admin@glamora.com', 'prince23103113');
-                console.log("Admin user created successfully.");
-                await signOut(auth); // Sign out after creation to allow for clean login.
-            } catch (creationError) {
-                console.error("Error creating admin user:", creationError);
-            }
+        if (error.code === 'auth/email-already-in-use') {
+            console.log("Admin user already exists.");
+        } else {
+            console.error("Error during admin user setup:", error);
         }
+    } finally {
+        // Mark setup as complete to prevent it from running again.
+        localStorage.setItem('adminSetupComplete', 'true');
     }
 };
-
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setupAdminUser(); // Ensure admin user exists on initial load
+        // Run the setup function once when the app loads.
+        setupAdminUser();
+
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
             setLoading(false);
         });
         
+        // Cleanup subscription on unmount
         return () => unsubscribe();
     }, []);
 
