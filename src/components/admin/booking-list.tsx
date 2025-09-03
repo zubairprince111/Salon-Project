@@ -24,6 +24,8 @@ interface Booking {
     items: BookingItem[];
     total: number;
     createdAt: Timestamp;
+    bookingDate: Timestamp;
+    bookingTime: string;
     status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
     paymentMethod: 'salon' | 'card' | 'wallet';
 }
@@ -89,7 +91,7 @@ export function BookingList() {
          <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead className="w-[180px]">Date</TableHead>
+                    <TableHead className="w-[200px]">Appointment</TableHead>
                     <TableHead>Customer</TableHead>
                     <TableHead>Services</TableHead>
                     <TableHead>Payment</TableHead>
@@ -101,7 +103,14 @@ export function BookingList() {
                 {bookings.map((booking) => (
                     <TableRow key={booking.id}>
                         <TableCell className="font-medium">
-                            {booking.createdAt ? format(booking.createdAt.toDate(), 'PPp') : 'N/A'}
+                           {booking.bookingDate ? (
+                                <>
+                                    <div>{format(booking.bookingDate.toDate(), 'PPP')}</div>
+                                    <div className="text-sm text-muted-foreground">{booking.bookingTime}</div>
+                                </>
+                            ) : (
+                                'N/A'
+                            )}
                         </TableCell>
                         <TableCell>
                             <div className="font-medium">{booking.name}</div>
@@ -130,3 +139,5 @@ export function BookingList() {
         </Table>
     );
 }
+
+    

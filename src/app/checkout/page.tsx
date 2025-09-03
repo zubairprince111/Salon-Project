@@ -13,20 +13,28 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, CreditCard, Smartphone, Store } from 'lucide-react';
+import { Trash2, CreditCard, Smartphone, Store, Loader2, CalendarIcon } from 'lucide-react';
 import { useCart } from '@/context/cart-context';
 import { app } from '@/lib/firebase';
 import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
 
 
 const checkoutSchema = z.object({
   name: z.string().min(2, "Name is required."),
   email: z.string().email("Invalid email address."),
   phone: z.string().min(10, "Invalid phone number."),
+  bookingDate: z.date({
+    required_error: "An appointment date is required.",
+  }),
+  bookingTime: z.string({
+      required_error: "An appointment time is required."
+  }),
   paymentMethod: z.enum(['salon', 'card', 'wallet'], {
     required_error: "You need to select a payment method."
   }),
@@ -37,6 +45,10 @@ const checkoutSchema = z.object({
   walletNumber: z.string().optional(),
   walletPin: z.string().optional(),
 });
+
+const timeSlots = [
+  '10:00 AM', '11:00 AM', '12:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM', '06:00 PM'
+];
 
 export default function CheckoutPage() {
   const { toast } = useToast();
@@ -50,6 +62,7 @@ export default function CheckoutPage() {
       email: "",
       phone: "",
       paymentMethod: "salon",
+      bookingTime: "",
     },
   });
 
@@ -67,6 +80,8 @@ export default function CheckoutPage() {
         name: values.name,
         email: values.email,
         phone: values.phone,
+        bookingDate: values.bookingDate,
+        bookingTime: values.bookingTime,
         items: items.map(item => ({id: item.id, name: item.name, price: item.price, quantity: item.quantity})),
         total,
         paymentMethod: values.paymentMethod,
@@ -82,7 +97,7 @@ export default function CheckoutPage() {
 
       toast({
           title: "Booking Confirmed!",
-          description: "Thank you for your booking. We will contact you shortly.",
+          description: `Your appointment is set for ${format(values.bookingDate, "PPP")} at ${values.bookingTime}.`,
       });
       
       clearCart();
@@ -217,10 +232,87 @@ export default function CheckoutPage() {
                               />
                             </CardContent>
                         </Card>
+
+                        <Card className="shadow-lg">
+                            <CardHeader>
+                                <CardTitle>2. Appointment Time</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <FormField
+                                    control={form.control}
+                                    name="bookingDate"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                        <FormLabel>Date</FormLabel>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                            <FormControl>
+                                                <Button
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-full pl-3 text-left font-normal",
+                                                    !field.value && "text-muted-foreground"
+                                                )}
+                                                >
+                                                {field.value ? (
+                                                    format(field.value, "PPP")
+                                                ) : (
+                                                    <span>Pick a date</span>
+                                                )}
+                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                </Button>
+                                            </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                            <Calendar
+                                                mode="single"
+                                                selected={field.value}
+                                                onSelect={field.onChange}
+                                                disabled={(date) =>
+                                                    date < new Date(new Date().setHours(0,0,0,0))
+                                                }
+                                                initialFocus
+                                            />
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="bookingTime"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Time Slot</FormLabel>
+                                            <FormControl>
+                                                <RadioGroup
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value}
+                                                    className="grid grid-cols-2 sm:grid-cols-4 gap-4"
+                                                >
+                                                    {timeSlots.map(time => (
+                                                        <FormItem key={time}>
+                                                          <FormControl>
+                                                              <RadioGroupItem value={time} id={time} className="sr-only"/>
+                                                          </FormControl>
+                                                          <Label htmlFor={time} className={cn("flex items-center justify-center rounded-md border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer text-sm", field.value === time && "border-primary")}>
+                                                              {time}
+                                                          </Label>
+                                                        </FormItem>
+                                                    ))}
+                                                </RadioGroup>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </CardContent>
+                        </Card>
                         
                         <Card className="shadow-lg">
                             <CardHeader>
-                                <CardTitle>2. Payment Method</CardTitle>
+                                <CardTitle>3. Payment Method</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <FormField
@@ -230,7 +322,7 @@ export default function CheckoutPage() {
                                         <FormItem>
                                             <FormControl>
                                                 <RadioGroup
-                                                    onValueChange={field.onChange}
+                                                    onValuecha<ctrl61>ge={field.onChange}
                                                     defaultValue={field.value}
                                                     className="grid md:grid-cols-3 gap-4"
                                                 >
@@ -317,3 +409,5 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
+    
