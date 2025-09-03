@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
 import { Header } from "@/components/glamora/header";
@@ -15,16 +15,22 @@ import { Loader2 } from 'lucide-react';
 
 export default function AdminLoginPage() {
     const [password, setPassword] = useState('');
-    const { login, loading } = useAuth();
+    const { login, loading, user } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
+
+    useEffect(() => {
+        if(user) {
+            router.push('/admin/dashboard');
+        }
+    }, [user, router]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             await login('admin@glamora.com', password);
             router.push('/admin/dashboard');
-        } catch (error) {
+        } catch (error: any) {
             toast({
                 title: "Login Failed",
                 description: "The password you entered is incorrect. Please try again.",

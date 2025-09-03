@@ -25,18 +25,12 @@ const setupAdmin = async () => {
         console.log('Admin user created successfully. Please change the password in the Firebase Authentication console.');
     } catch (error: any) {
         if (error.code === 'auth/email-already-in-use') {
-            console.log('Admin user already exists.');
+            // This is expected if the user already exists, so we can ignore it.
         } else {
             console.error('Error creating admin user:', error);
         }
     }
 }
 
-// Call this function to ensure the admin user exists when the app starts.
-// In a real production app, you might do this in a separate setup script.
-if (typeof window !== 'undefined') {
-    setupAdmin();
-}
 
-
-export { app };
+export { app, setupAdmin };

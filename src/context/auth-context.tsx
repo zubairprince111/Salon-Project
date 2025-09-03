@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, User, signOut } from "firebase/auth";
-import { app } from '@/lib/firebase';
+import { app, setupAdmin } from '@/lib/firebase';
 
 interface AuthContextType {
     user: User | null;
@@ -13,31 +13,25 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Call setupAdmin once when the app loads.
+setupAdmin();
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const auth = getAuth(app);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
-            setLoading(false);
-            if(user) {
-                sessionStorage.setItem('glamora-admin', 'true');
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+            if (currentUser) {
+                sessionStorage.setItem('glamora-admin-loggedin', 'true');
             } else {
-                sessionStorage.removeItem('glamora-admin');
+                sessionStorage.removeItem('glamora-admin-loggedin');
             }
-        });
-
-        // Check session storage on initial load
-        if (sessionStorage.getItem('glamora-admin')) {
-             // This is a simplified check. In a real app, you'd verify the token.
-             // For now, we trust the session storage. We will re-validate with onAuthStateChanged.
-        } else {
             setLoading(false);
-        }
-
-
+        });
+        
         return () => unsubscribe();
     }, [auth]);
 
@@ -45,14 +39,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(true);
         try {
             await signInWithEmailAndPassword(auth, email, password);
-        } finally {
-            setLoading(false);
+        } catch (error) {
+            setLoading(false); // Ensure loading is turned off on failure
+            throw error; // Re-throw error to be caught by the login form
         }
+        // setLoading will be set to false by onAuthStateChanged
     };
 
     const logout = async () => {
+        setLoading(true);
         await signOut(auth);
-        sessionStorage.removeItem('glamora-admin');
+        // setLoading will be set to false by onAuthStateChanged
     };
 
     const value = { user, loading, login, logout };

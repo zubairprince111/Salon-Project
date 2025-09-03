@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { BookingList } from "@/components/admin/booking-list";
 
 export default function AdminDashboard() {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -38,13 +38,7 @@ export default function AdminDashboard() {
       <main className="flex-grow container mx-auto px-4 md:px-6 py-12">
         <div className="flex justify-between items-center mb-8">
           <h1 className="font-headline text-4xl md:text-5xl font-bold">Admin Dashboard</h1>
-           <Button onClick={() => {
-                const {logout} = useAuth.getInitialProps ? useAuth.getInitialProps() : {logout: () => {
-                    sessionStorage.removeItem('glamora-admin');
-                    window.location.reload();
-                }};
-                logout();
-            }}>Logout</Button>
+           <Button onClick={() => logout()}>Logout</Button>
         </div>
         <BookingList />
       </main>
