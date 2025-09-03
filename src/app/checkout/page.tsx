@@ -89,8 +89,6 @@ export default function CheckoutPage() {
         const batch = writeBatch(db);
         const now = serverTimestamp();
         
-        const bookingIds: string[] = [];
-
         const appointmentTimestamp = new Date(values.bookingDate);
         const [time, period] = values.bookingTime.split(' ');
         let [hours, minutes] = time.split(':').map(Number);
@@ -98,23 +96,22 @@ export default function CheckoutPage() {
         if (period === 'AM' && hours === 12) hours = 0;
         appointmentTimestamp.setHours(hours, minutes, 0, 0);
 
-        // Create a booking document for each item in the cart
-        items.forEach(item => {
-            const bookingRef = doc(collection(db, "bookings"));
-            batch.set(bookingRef, {
-                userId: values.email, // Using email as userId as there are no customer accounts
-                servicename: item.name,
-                timeslot: appointmentTimestamp,
-                status: 'pending',
-                bookedat: now
-            });
-            bookingIds.push(bookingRef.id);
+        // Create a single booking document for the entire cart
+        const bookingRef = doc(collection(db, "bookings"));
+        const serviceNames = items.map(item => item.name).join(', ');
+
+        batch.set(bookingRef, {
+            userId: values.email, // Using email as a simple identifier
+            servicename: serviceNames,
+            timeslot: appointmentTimestamp,
+            status: 'pending',
+            bookedat: now
         });
 
         // Create a single payment document for the entire transaction
         const paymentRef = doc(collection(db, 'payments'));
         batch.set(paymentRef, {
-            bookingid: bookingIds.join(','), // Storing all related booking IDs
+            bookingid: bookingRef.id,
             userid: values.email,
             amount: total,
             currency: 'BDT', // Assuming BDT as currency
@@ -440,5 +437,3 @@ export default function CheckoutPage() {
     </div>
   );
 }
-
-    
