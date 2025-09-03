@@ -3,10 +3,10 @@
 
 import { useState, useEffect } from 'react';
 import { app } from '@/lib/firebase';
-import { getFirestore, collection, getDocs, Timestamp } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, Timestamp, query, orderBy } from 'firebase/firestore';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CreditCard, Smartphone, Store } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface Booking {
@@ -16,12 +16,6 @@ interface Booking {
     timeslot: Timestamp;
     status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
     bookedat: Timestamp;
-    paymentMethod?: string;
-}
-
-interface Payment {
-    bookingid: string;
-    paymentmethod: string;
 }
 
 export function BookingList() {
@@ -30,49 +24,30 @@ export function BookingList() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchBookingsAndPayments = async () => {
+        const fetchBookings = async () => {
             setLoading(true);
             try {
                 const db = getFirestore(app);
-                
-                // 1. Fetch all bookings
                 const bookingsCollection = collection(db, 'bookings');
-                const bookingSnapshot = await getDocs(bookingsCollection);
+                const q = query(bookingsCollection, orderBy('bookedat', 'desc'));
+                const bookingSnapshot = await getDocs(q);
+                
                 const bookingsList = bookingSnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
-                })) as Omit<Booking, 'paymentMethod'>[];
-
-                // 2. Fetch all payments
-                const paymentsCollection = collection(db, 'payments');
-                const paymentSnapshot = await getDocs(paymentsCollection);
-                const paymentsList = paymentSnapshot.docs.map(doc => doc.data() as Payment);
+                })) as Booking[];
                 
-                // 3. Create a map of bookingId -> paymentMethod
-                const paymentMethodMap = new Map<string, string>();
-                paymentsList.forEach(payment => {
-                    if (payment.bookingid && payment.paymentmethod) {
-                        paymentMethodMap.set(payment.bookingid, payment.paymentmethod);
-                    }
-                });
-
-                // 4. Combine booking with payment method
-                const combinedBookings = bookingsList.map(booking => ({
-                    ...booking,
-                    paymentMethod: paymentMethodMap.get(booking.id) || 'N/A' // Set a default if no payment found
-                })).sort((a, b) => b.bookedat.toMillis() - a.bookedat.toMillis()); // Sort by most recent booking
-
-                setBookings(combinedBookings);
+                setBookings(bookingsList);
                 setError(null);
             } catch (e) {
-                console.error("Error fetching data: ", e);
-                setError("Failed to load bookings or payments.");
+                console.error("Error fetching bookings: ", e);
+                setError("Failed to load bookings.");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchBookingsAndPayments();
+        fetchBookings();
     }, []);
 
     if (loading) {
@@ -91,15 +66,6 @@ export function BookingList() {
     if (bookings.length === 0) {
         return <p className="text-muted-foreground text-center py-10">No bookings have been made yet.</p>;
     }
-    
-    const PaymentMethodIcon = ({method}: {method?: string}) => {
-        switch(method) {
-            case 'card': return <CreditCard className="inline mr-2 h-4 w-4" />;
-            case 'wallet': return <Smartphone className="inline mr-2 h-4 w-4" />;
-            case 'salon': return <Store className="inline mr-2 h-4 w-4" />;
-            default: return null;
-        }
-    }
 
     return (
          <Table>
@@ -109,7 +75,7 @@ export function BookingList() {
                     <TableHead>Customer (User ID)</TableHead>
                     <TableHead>Service(s)</TableHead>
                     <TableHead>Booked At</TableHead>
-                    <TableHead>Status & Payment</TableHead>
+                    <TableHead>Status</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -135,19 +101,13 @@ export function BookingList() {
                              {booking.bookedat ? format(booking.bookedat.toDate(), 'PPP p') : 'N/A'}
                          </TableCell>
                         <TableCell>
-                            <div className="flex items-center gap-2">
-                                <Badge variant={
-                                    booking.status === 'completed' ? 'default' : 
-                                    booking.status === 'confirmed' ? 'secondary' :
-                                    booking.status === 'pending' ? 'outline' : 'destructive'
-                                } className="capitalize">
-                                    {booking.status}
-                                </Badge>
-                                <div className="flex items-center capitalize text-muted-foreground text-sm">
-                                    <PaymentMethodIcon method={booking.paymentMethod} />
-                                    {booking.paymentMethod}
-                                </div>
-                            </div>
+                            <Badge variant={
+                                booking.status === 'completed' ? 'default' : 
+                                booking.status === 'confirmed' ? 'secondary' :
+                                booking.status === 'pending' ? 'outline' : 'destructive'
+                            } className="capitalize">
+                                {booking.status}
+                            </Badge>
                         </TableCell>
                     </TableRow>
                 ))}
