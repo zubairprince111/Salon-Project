@@ -281,7 +281,7 @@ const ContactSection = () => (
             <div>
               <h3 className="font-headline font-semibold">Our Address</h3>
               <p className="text-muted-foreground">
-                123 Beauty Avenue, Elegance City, 12345
+                Shop No: 41 (1st Floor), RUAP, Commercial Complex Market, Dhaka 1230
               </p>
             </div>
           </div>
@@ -289,7 +289,7 @@ const ContactSection = () => (
             <Phone className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
             <div>
               <h3 className="font-headline font-semibold">Phone</h3>
-              <p className="text-muted-foreground">(123) 456-7890</p>
+              <p className="text-muted-foreground">01877860659</p>
             </div>
           </div>
           <div className="flex items-start gap-4">
