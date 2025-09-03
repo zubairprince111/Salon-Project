@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Trash2, CreditCard, Smartphone, Store, Loader2, CalendarIcon } from 'lucide-react';
 import { useCart } from '@/context/cart-context';
 import { app } from '@/lib/firebase';
-import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { getFirestore, collection, addDoc, serverTimestamp, writeBatch, doc } from "firebase/firestore";
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
@@ -71,44 +71,75 @@ export default function CheckoutPage() {
 
   async function onSubmit(values: z.infer<typeof checkoutSchema>) {
     setIsLoading(true);
+    if (items.length === 0) {
+        toast({
+            title: "Your cart is empty",
+            description: "Please add a service to your booking before checking out.",
+            variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+    }
+    
     // Simulate payment processing delay
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     try {
-      const db = getFirestore(app);
-      const bookingData: any = {
-        name: values.name,
-        email: values.email,
-        phone: values.phone,
-        bookingDate: values.bookingDate,
-        bookingTime: values.bookingTime,
-        items: items.map(item => ({id: item.id, name: item.name, price: item.price, quantity: item.quantity})),
-        total,
-        paymentMethod: values.paymentMethod,
-        createdAt: serverTimestamp(),
-        status: 'pending'
-      }
+        const db = getFirestore(app);
+        const batch = writeBatch(db);
+        const now = serverTimestamp();
+        
+        const bookingIds: string[] = [];
 
-      if (values.paymentMethod !== 'salon') {
-        bookingData.status = 'confirmed'; // Auto-confirm "paid" bookings
-      }
+        const appointmentTimestamp = new Date(values.bookingDate);
+        const [time, period] = values.bookingTime.split(' ');
+        let [hours, minutes] = time.split(':').map(Number);
+        if (period === 'PM' && hours < 12) hours += 12;
+        if (period === 'AM' && hours === 12) hours = 0;
+        appointmentTimestamp.setHours(hours, minutes, 0, 0);
 
-      await addDoc(collection(db, "bookings"), bookingData);
+        // Create a booking document for each item in the cart
+        items.forEach(item => {
+            const bookingRef = doc(collection(db, "bookings"));
+            batch.set(bookingRef, {
+                userId: values.email, // Using email as userId as there are no customer accounts
+                servicename: item.name,
+                timeslot: appointmentTimestamp,
+                status: 'pending',
+                bookedat: now
+            });
+            bookingIds.push(bookingRef.id);
+        });
 
-      toast({
-          title: "Booking Confirmed!",
-          description: `Your appointment is set for ${format(values.bookingDate, "PPP")} at ${values.bookingTime}.`,
-      });
-      
-      clearCart();
-      form.reset();
+        // Create a single payment document for the entire transaction
+        const paymentRef = doc(collection(db, 'payments'));
+        batch.set(paymentRef, {
+            bookingid: bookingIds.join(','), // Storing all related booking IDs
+            userid: values.email,
+            amount: total,
+            currency: 'BDT', // Assuming BDT as currency
+            paymentmethod: values.paymentMethod,
+            transactionid: `demo_${Date.now()}`,
+            status: values.paymentMethod === 'salon' ? 'pending' : 'paid',
+            paidat: now
+        });
+
+        await batch.commit();
+
+        toast({
+            title: "Booking Confirmed!",
+            description: `Your appointment is set for ${format(values.bookingDate, "PPP")} at ${values.bookingTime}.`,
+        });
+        
+        clearCart();
+        form.reset();
     } catch (error) {
-      console.error("Error creating booking: ", error);
-       toast({
-          title: "Booking Failed",
-          description: "There was an error submitting your booking. Please try again.",
-          variant: "destructive"
-      });
+        console.error("Error creating booking: ", error);
+        toast({
+            title: "Booking Failed",
+            description: "There was an error submitting your booking. Please try again.",
+            variant: "destructive"
+        });
     } finally {
         setIsLoading(false);
     }
@@ -409,3 +440,5 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
+    
