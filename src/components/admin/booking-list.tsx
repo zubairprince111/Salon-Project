@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -5,7 +6,7 @@ import { app } from '@/lib/firebase';
 import { getFirestore, collection, getDocs, query, orderBy, Timestamp } from 'firebase/firestore';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CreditCard, Smartphone, Store } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface BookingItem {
@@ -24,6 +25,19 @@ interface Booking {
     total: number;
     createdAt: Timestamp;
     status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+    paymentMethod: 'salon' | 'card' | 'wallet';
+}
+
+const PaymentMethodDisplay = ({ method }: { method: Booking['paymentMethod']}) => {
+    switch(method) {
+        case 'card':
+            return <span className="flex items-center gap-1.5"><CreditCard className="h-4 w-4"/> Credit Card</span>;
+        case 'wallet':
+            return <span className="flex items-center gap-1.5"><Smartphone className="h-4 w-4"/> Mobile Wallet</span>;
+        case 'salon':
+        default:
+            return <span className="flex items-center gap-1.5"><Store className="h-4 w-4"/> At Salon</span>;
+    }
 }
 
 export function BookingList() {
@@ -78,6 +92,7 @@ export function BookingList() {
                     <TableHead className="w-[180px]">Date</TableHead>
                     <TableHead>Customer</TableHead>
                     <TableHead>Services</TableHead>
+                    <TableHead>Payment</TableHead>
                     <TableHead className="text-right">Total</TableHead>
                      <TableHead className="text-center">Status</TableHead>
                 </TableRow>
@@ -96,11 +111,15 @@ export function BookingList() {
                         <TableCell>
                             {booking.items.map(item => item.name).join(', ')}
                         </TableCell>
+                        <TableCell>
+                           <PaymentMethodDisplay method={booking.paymentMethod} />
+                        </TableCell>
                         <TableCell className="text-right">৳{booking.total.toFixed(2)}</TableCell>
                         <TableCell className="text-center">
                             <Badge variant={
                                 booking.status === 'completed' ? 'default' : 
-                                booking.status === 'pending' ? 'secondary' : 'destructive'
+                                booking.status === 'confirmed' ? 'secondary' :
+                                booking.status === 'pending' ? 'outline' : 'destructive'
                             } className="capitalize">
                                 {booking.status}
                             </Badge>
