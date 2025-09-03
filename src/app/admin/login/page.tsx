@@ -14,8 +14,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function AdminLoginPage() {
-    const [email, setEmail] = useState('admin@glamora.com');
-    const [password, setPassword] = useState('prince23103113');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const { login, loading, user } = useAuth();
     const router = useRouter();
