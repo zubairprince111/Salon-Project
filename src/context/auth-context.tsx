@@ -2,8 +2,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, onAuthStateChanged, signOut, signInWithEmailAndPassword, Auth } from "firebase/auth";
-import { auth, setupAdmin } from '@/lib/firebase';
+import { User, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from '@/lib/firebase';
 
 interface AuthContextType {
     user: User | null;
@@ -14,28 +14,17 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// A self-invoking function to ensure admin setup is triggered only once.
-const setupPromise = setupAdmin();
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // We wait for the admin setup to complete before we start listening to auth state changes.
-        // This prevents race conditions on initial load.
-        setupPromise.then(() => {
-            const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-                setUser(currentUser);
-                setLoading(false);
-            });
-            
-            // Cleanup subscription on unmount
-            return () => unsubscribe();
-        }).catch(err => {
-            console.error("Error during admin setup, auth might not work correctly", err);
-            setLoading(false); // Stop loading even if setup fails
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+            setLoading(false);
         });
+        
+        return () => unsubscribe();
     }, []);
 
     const login = async (email: string, password: string) => {

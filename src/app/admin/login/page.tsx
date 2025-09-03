@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Header } from "@/components/glamora/header";
 import { Footer } from "@/components/glamora/footer";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from 'lucide-react';
 
 
 export default function AdminLoginPage() {
@@ -23,7 +26,6 @@ export default function AdminLoginPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        // If the user is already logged in, redirect them to the dashboard.
         if (!loading && user) {
             router.push('/admin/dashboard');
         }
@@ -42,9 +44,8 @@ export default function AdminLoginPage() {
         setIsSubmitting(true);
         try {
             await login(email, password);
-            // On successful login, the useEffect above will trigger the redirect.
         } catch (error: any) {
-            console.error("Login Error:", error.message);
+            console.error("Login Error:", error);
             toast({
                 title: "Login Failed",
                 description: "The email or password you entered is incorrect. Please try again.",
@@ -55,31 +56,14 @@ export default function AdminLoginPage() {
         }
     };
     
-    // While checking auth state, show a generic loading screen.
-    if (loading) {
+    if (loading || user) {
         return (
              <div className="flex flex-col min-h-dvh bg-background text-foreground">
                 <Header />
                 <main className="flex-grow container mx-auto px-4 md:px-6 py-12 md:py-24 flex items-center justify-center">
                     <div className="text-center flex items-center gap-4">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        <p className="text-muted-foreground">Initializing...</p>
-                    </div>
-                </main>
-                <Footer />
-            </div>
-        )
-    }
-    
-    // If user exists, we are in the process of redirecting.
-    if (user) {
-         return (
-             <div className="flex flex-col min-h-dvh bg-background text-foreground">
-                <Header />
-                <main className="flex-grow container mx-auto px-4 md:px-6 py-12 md:py-24 flex items-center justify-center">
-                    <div className="text-center flex items-center gap-4">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        <p className="text-muted-foreground">Redirecting to Dashboard...</p>
+                        <p className="text-muted-foreground">Loading session...</p>
                     </div>
                 </main>
                 <Footer />
@@ -87,7 +71,6 @@ export default function AdminLoginPage() {
         )
     }
 
-    // Otherwise, show the login form.
     return (
         <div className="flex flex-col min-h-dvh bg-background text-foreground">
             <Header />
@@ -98,6 +81,13 @@ export default function AdminLoginPage() {
                         <CardDescription>Enter your credentials to access the admin dashboard.</CardDescription>
                     </CardHeader>
                     <CardContent>
+                        <Alert className="mb-4">
+                          <Terminal className="h-4 w-4" />
+                          <AlertTitle>First time?</AlertTitle>
+                          <AlertDescription>
+                            You must <Link href="/admin/setup" className="font-semibold underline hover:text-primary">create the admin user</Link> first.
+                          </AlertDescription>
+                        </Alert>
                         <form onSubmit={handleLogin} className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>
