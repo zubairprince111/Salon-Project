@@ -23,6 +23,7 @@ export default function AdminLoginPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
+        // If the user is already logged in, redirect them to the dashboard.
         if (!loading && user) {
             router.push('/admin/dashboard');
         }
@@ -41,9 +42,9 @@ export default function AdminLoginPage() {
         setIsSubmitting(true);
         try {
             await login(email, password);
-            // The useEffect will handle redirection on successful login
+            // On successful login, the useEffect above will trigger the redirect.
         } catch (error: any) {
-            console.error("Login Error Code:", error.code);
+            console.error("Login Error:", error.message);
             toast({
                 title: "Login Failed",
                 description: "The email or password you entered is incorrect. Please try again.",
@@ -54,6 +55,7 @@ export default function AdminLoginPage() {
         }
     };
     
+    // While checking auth state, show a generic loading screen.
     if (loading) {
         return (
              <div className="flex flex-col min-h-dvh bg-background text-foreground">
@@ -69,7 +71,7 @@ export default function AdminLoginPage() {
         )
     }
     
-    // If user is already logged in, don't render the form, let useEffect redirect
+    // If user exists, we are in the process of redirecting.
     if (user) {
          return (
              <div className="flex flex-col min-h-dvh bg-background text-foreground">
@@ -85,6 +87,7 @@ export default function AdminLoginPage() {
         )
     }
 
+    // Otherwise, show the login form.
     return (
         <div className="flex flex-col min-h-dvh bg-background text-foreground">
             <Header />
@@ -122,7 +125,7 @@ export default function AdminLoginPage() {
                             </div>
                             <Button type="submit" className="w-full" disabled={isSubmitting}>
                                  {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                Login
+                                {isSubmitting ? 'Logging In...' : 'Login'}
                             </Button>
                         </form>
                     </CardContent>

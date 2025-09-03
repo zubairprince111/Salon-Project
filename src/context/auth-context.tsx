@@ -2,7 +2,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebase/auth";
+import { User, onAuthStateChanged, signOut, signInWithEmailAndPassword, Auth } from "firebase/auth";
 import { auth, setupAdmin } from '@/lib/firebase';
 
 interface AuthContextType {
@@ -14,36 +14,38 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Call setupAdmin once when the app loads. This is a self-invoking async function.
-(async () => {
-  try {
-    await setupAdmin();
-  } catch (e) {
-    console.error("Admin setup failed", e);
-  }
-})();
+// A self-invoking function to ensure admin setup is triggered only once.
+const setupPromise = setupAdmin();
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
-            setLoading(false);
+        // We wait for the admin setup to complete before we start listening to auth state changes.
+        // This prevents race conditions on initial load.
+        setupPromise.then(() => {
+            const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                setUser(currentUser);
+                setLoading(false);
+            });
+            
+            // Cleanup subscription on unmount
+            return () => unsubscribe();
+        }).catch(err => {
+            console.error("Error during admin setup, auth might not work correctly", err);
+            setLoading(false); // Stop loading even if setup fails
         });
-        
-        return () => unsubscribe();
     }, []);
 
     const login = async (email: string, password: string) => {
-       // setLoading(true) is not needed here as onAuthStateChanged handles it
        await signInWithEmailAndPassword(auth, email, password);
+       // onAuthStateChanged will handle setting the user and loading state
     };
 
     const logout = async () => {
         await signOut(auth);
-        // User state will be updated to null by onAuthStateChanged
+        // onAuthStateChanged will handle setting the user to null
     };
     
     const value = { user, loading, login, logout };
