@@ -3,10 +3,10 @@
 
 import { useState, useEffect } from 'react';
 import { app } from '@/lib/firebase';
-import { getFirestore, collection, getDocs, query, orderBy, Timestamp } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, query, where, Timestamp } from 'firebase/firestore';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CreditCard, Smartphone, Store } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface Booking {
@@ -16,6 +16,12 @@ interface Booking {
     timeslot: Timestamp;
     status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
     bookedat: Timestamp;
+    paymentMethod?: string; // Optional field
+}
+
+interface Payment {
+    bookingid: string;
+    paymentmethod: string;
 }
 
 export function BookingList() {
@@ -24,26 +30,47 @@ export function BookingList() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchBookings = async () => {
+        const fetchBookingsAndPayments = async () => {
             try {
                 const db = getFirestore(app);
+                
+                // Fetch all bookings
                 const bookingsCollection = collection(db, 'bookings');
-                const q = query(bookingsCollection, orderBy('bookedat', 'desc'));
-                const bookingSnapshot = await getDocs(q);
+                const bookingSnapshot = await getDocs(bookingsCollection);
                 const bookingsList = bookingSnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
-                })) as Booking[];
-                setBookings(bookingsList);
+                })) as Omit<Booking, 'paymentMethod'>[];
+
+                // Fetch all payments
+                const paymentsCollection = collection(db, 'payments');
+                const paymentSnapshot = await getDocs(paymentsCollection);
+                const paymentsList = paymentSnapshot.docs.map(doc => doc.data() as Payment);
+                
+                // Create a map of bookingId to paymentMethod for easy lookup
+                const paymentMethodMap = new Map<string, string>();
+                paymentsList.forEach(payment => {
+                    paymentMethodMap.set(payment.bookingid, payment.paymentmethod);
+                });
+
+                // Combine booking with payment method
+                const combinedBookings = bookingsList.map(booking => ({
+                    ...booking,
+                    paymentMethod: paymentMethodMap.get(booking.id) || 'N/A'
+                })).sort((a, b) => b.bookedat.toMillis() - a.bookedat.toMillis());
+
+
+                setBookings(combinedBookings);
+
             } catch (e) {
-                console.error("Error fetching bookings: ", e);
-                setError("Failed to load bookings.");
+                console.error("Error fetching data: ", e);
+                setError("Failed to load bookings or payments.");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchBookings();
+        fetchBookingsAndPayments();
     }, []);
 
     if (loading) {
@@ -62,6 +89,16 @@ export function BookingList() {
     if (bookings.length === 0) {
         return <p className="text-muted-foreground text-center py-10">No bookings have been made yet.</p>;
     }
+    
+    const PaymentMethodIcon = ({method}: {method?: string}) => {
+        switch(method) {
+            case 'card': return <CreditCard className="inline mr-2 h-4 w-4" />;
+            case 'wallet': return <Smartphone className="inline mr-2 h-4 w-4" />;
+            case 'salon': return <Store className="inline mr-2 h-4 w-4" />;
+            default: return null;
+        }
+    }
+
 
     return (
          <Table>
@@ -69,7 +106,8 @@ export function BookingList() {
                 <TableRow>
                     <TableHead>Appointment</TableHead>
                     <TableHead>Customer (User ID)</TableHead>
-                    <TableHead>Service</TableHead>
+                    <TableHead>Service(s)</TableHead>
+                    <TableHead>Payment</TableHead>
                     <TableHead>Booked At</TableHead>
                     <TableHead className="text-center">Status</TableHead>
                 </TableRow>
@@ -93,6 +131,12 @@ export function BookingList() {
                         <TableCell>
                             {booking.servicename}
                         </TableCell>
+                        <TableCell>
+                            <div className="flex items-center capitalize">
+                                <PaymentMethodIcon method={booking.paymentMethod} />
+                                {booking.paymentMethod}
+                            </div>
+                         </TableCell>
                          <TableCell>
                              {booking.bookedat ? format(booking.bookedat.toDate(), 'PPP p') : 'N/A'}
                          </TableCell>
@@ -111,5 +155,3 @@ export function BookingList() {
         </Table>
     );
 }
-
-    
