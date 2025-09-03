@@ -31,6 +31,7 @@ export function BookingList() {
 
     useEffect(() => {
         const fetchBookingsAndPayments = async () => {
+            setLoading(true);
             try {
                 const db = getFirestore(app);
                 
@@ -50,7 +51,9 @@ export function BookingList() {
                 // 3. Create a map of bookingId -> paymentMethod
                 const paymentMethodMap = new Map<string, string>();
                 paymentsList.forEach(payment => {
-                    paymentMethodMap.set(payment.bookingid, payment.paymentmethod);
+                    if (payment.bookingid && payment.paymentmethod) {
+                        paymentMethodMap.set(payment.bookingid, payment.paymentmethod);
+                    }
                 });
 
                 // 4. Combine booking with payment method
@@ -60,7 +63,7 @@ export function BookingList() {
                 })).sort((a, b) => b.bookedat.toMillis() - a.bookedat.toMillis()); // Sort by most recent booking
 
                 setBookings(combinedBookings);
-
+                setError(null);
             } catch (e) {
                 console.error("Error fetching data: ", e);
                 setError("Failed to load bookings or payments.");
@@ -82,7 +85,7 @@ export function BookingList() {
     }
 
     if (error) {
-        return <p className="text-destructive text-center">{error}</p>;
+        return <p className="text-destructive text-center py-10">{error}</p>;
     }
     
     if (bookings.length === 0) {
@@ -97,7 +100,6 @@ export function BookingList() {
             default: return null;
         }
     }
-
 
     return (
          <Table>
